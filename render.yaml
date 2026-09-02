@@ -1,0 +1,15 @@
+﻿services:
+  - type: web
+    name: placeiq
+    runtime: docker
+    repo: https://github.com/Riteshkumarsingh1/placeiq
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        value: your_db_url_here
+      - key: SECRET_KEY
+        value: your_secret_key
+      - key: JWT_SECRET_KEY
+        value: your_jwt_secret
+      - key: GROQ_API_KEY
+        value: your_groq_api_key
