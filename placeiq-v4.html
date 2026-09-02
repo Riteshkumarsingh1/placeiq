@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PlaceIQ — by Ritesh Kumar Singh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100;300;400;600;700;900&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--tt:0.4s cubic-bezier(0.4,0,0.2,1)}
+[data-theme="dark"]{--bg:#020810;--bg2:#060D1A;--bg3:#0A1628;--surf:rgba(8,18,36,0.88);--surf2:rgba(14,26,50,0.92);--b1:rgba(0,255,209,0.07);--b2:rgba(0,255,209,0.17);--b3:rgba(0,255,209,0.38);--t1:#E8F4FF;--t2:#7A9CC0;--t3:#3A5470;--a:#00FFD1;--ar:0,255,209;--a2:#7C3AFF;--a2r:124,58,255;--a3:#FF2D6E;--a3r:255,45,110;--gold:#FFB800;--goldr:255,184,0;--nav:rgba(2,8,16,0.94);--inp:rgba(4,10,22,0.85);--gc:rgba(0,255,209,0.025);--cg:0 0 50px rgba(0,255,209,0.05),0 4px 24px rgba(0,0,0,0.55);--cgh:0 0 80px rgba(0,255,209,0.18),0 12px 50px rgba(0,0,0,0.65)}
+[data-theme="light"]{--bg:#EEF3FF;--bg2:#E2ECFF;--bg3:#FFFFFF;--surf:rgba(255,255,255,0.92);--surf2:rgba(238,243,255,0.96);--b1:rgba(80,50,200,0.08);--b2:rgba(80,50,200,0.18);--b3:rgba(80,50,200,0.42);--t1:#0A1630;--t2:#3A5070;--t3:#8AA0C0;--a:#009980;--ar:0,153,128;--a2:#5B1FCC;--a2r:91,31,204;--a3:#D41E5A;--a3r:212,30,90;--gold:#A06000;--goldr:160,96,0;--nav:rgba(238,243,255,0.94);--inp:rgba(255,255,255,0.9);--gc:rgba(80,50,200,0.035);--cg:0 4px 24px rgba(80,50,200,0.08),0 1px 4px rgba(0,0,0,0.05);--cgh:0 12px 56px rgba(80,50,200,0.2),0 4px 16px rgba(0,0,0,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;cursor:none;transition:background var(--tt),color var(--tt)}
+.page{display:none;min-height:100vh;flex-direction:column}.page.active{display:flex}
+option{background:var(--bg2)}
+::selection{background:rgba(var(--ar),0.25);color:var(--a)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(var(--ar),0.35);border-radius:2px}
+
+/* CURSOR */
+#cur,#curR,#curT{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+#cur{width:8px;height:8px;background:var(--a);z-index:9999;transition:width .15s,height .15s;mix-blend-mode:difference}
+#curR{width:32px;height:32px;border:1.5px solid rgba(var(--ar),0.5);z-index:9998;transition:width .22s,height .22s,border-color .2s}
+#curT{width:60px;height:60px;border:1px solid rgba(var(--ar),0.15);z-index:9997;transition:width .32s,height .32s}
+body.hov #cur{width:16px;height:16px}
+body.hov #curR{width:50px;height:50px;border-color:rgba(var(--ar),0.8)}
+body.hov #curT{width:80px;height:80px}
+
+/* BG */
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+.grid{position:fixed;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(var(--gc) 1px,transparent 1px),linear-gradient(90deg,var(--gc) 1px,transparent 1px);background-size:56px 56px;transition:background var(--tt)}
+.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:1;animation:drift 22s ease-in-out infinite;will-change:transform}
+.o1{width:560px;height:560px;background:radial-gradient(circle,rgba(var(--ar),0.07),transparent 70%);top:-200px;right:-150px;animation-delay:0s}
+.o2{width:440px;height:440px;background:radial-gradient(circle,rgba(var(--a2r),0.06),transparent 70%);bottom:-150px;left:-120px;animation-delay:-9s}
+.o3{width:320px;height:320px;background:radial-gradient(circle,rgba(var(--a3r),0.04),transparent 70%);top:45%;left:38%;animation-delay:-17s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(28px,-28px) scale(1.04)}66%{transform:translate(-18px,22px) scale(0.97)}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:500;height:66px;display:flex;align-items:center;padding:0 2rem;gap:1.2rem;background:var(--nav);backdrop-filter:blur(22px) saturate(190%);border-bottom:1px solid var(--b2);transition:background var(--tt),border-color var(--tt)}
+.nbrand{font-family:'Exo 2',sans-serif;font-size:1.45rem;font-weight:900;letter-spacing:-.05em;cursor:pointer;background:linear-gradient(120deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;position:relative}
+.nbrand::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--a),transparent);transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.nbrand:hover::after{transform:scaleX(1)}
+.nlinks{display:flex;gap:.2rem;flex:1;overflow-x:auto;scrollbar-width:none}
+.nl{position:relative;color:var(--t2);font-size:.82rem;font-weight:500;padding:.44rem .88rem;border-radius:8px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap;border:1px solid transparent;overflow:hidden}
+.nl::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--ar),.1),rgba(var(--a2r),.08));opacity:0;transition:opacity .25s;border-radius:8px}
+.nl::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1.5px;background:var(--a);transform:scaleX(0);transform-origin:center;transition:transform .3s cubic-bezier(.23,1,.32,1)}
+.nl:hover{color:var(--t1);border-color:var(--b2)}.nl:hover::before{opacity:1}.nl:hover::after{transform:scaleX(1)}
+.nl.active{color:var(--a);border-color:var(--b3);background:rgba(var(--ar),.06)}.nl.active::before{opacity:1}.nl.active::after{transform:scaleX(1)}
+.navr{display:flex;align-items:center;gap:.7rem;margin-left:auto}
+.thbtn{width:38px;height:38px;border-radius:9px;border:1px solid var(--b2);background:transparent;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .25s;flex-shrink:0}
+.thbtn:hover{border-color:var(--a);color:var(--a);background:rgba(var(--ar),.08);transform:rotate(25deg) scale(1.15)}
+.nusr{font-size:.78rem;color:var(--t3);font-family:'DM Mono',monospace;white-space:nowrap}
+.lbtn{background:rgba(var(--a3r),.1);border:1px solid rgba(var(--a3r),.25);color:var(--a3);border-radius:8px;padding:.36rem .85rem;font-size:.8rem;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .25s}
+.lbtn:hover{background:rgba(var(--a3r),.22);transform:translateY(-1px);box-shadow:0 0 16px rgba(var(--a3r),.3)}
+
+/* MAIN */
+.abody{flex:1;position:relative;z-index:10}
+main{max-width:1300px;width:100%;margin:0 auto;padding:2.5rem 2rem}
+.tab{display:none}.tab.active{display:block}
+
+/* AUTH */
+.awrap{min-height:100vh;display:flex;position:relative;z-index:10}
+.al{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:3rem 2rem;min-height:100vh}
+.abrand{font-family:'Exo 2',sans-serif;font-size:2.5rem;font-weight:900;letter-spacing:-.06em;background:linear-gradient(120deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3rem;text-align:center}
+.atag{color:var(--t3);font-size:.76rem;font-family:'DM Mono',monospace;letter-spacing:.07em;text-align:center;margin-bottom:2.2rem}
+.acard{background:var(--surf2);border:1px solid var(--b2);border-radius:22px;padding:2.4rem 2.6rem;width:100%;max-width:440px;box-shadow:var(--cg);position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.acard::before{content:'';position:absolute;top:-1px;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,var(--a),var(--a2),transparent)}
+.acard::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(var(--ar),.04),transparent 60%);pointer-events:none}
+.acard:hover{border-color:var(--b3);box-shadow:var(--cgh)}
+/* shimmer sweep on auth card hover */
+.acard .sweep{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(var(--ar),.05),transparent);transform:skewX(-20deg);transition:left .7s cubic-bezier(.23,1,.32,1);z-index:0;pointer-events:none}
+.acard:hover .sweep{left:160%}
+.ah{font-family:'Exo 2',sans-serif;font-size:1.55rem;font-weight:800;margin-bottom:.35rem;position:relative;z-index:1}
+.asub{color:var(--t2);font-size:.84rem;margin-bottom:1.9rem;line-height:1.65;position:relative;z-index:1}
+.fld{margin-bottom:1.15rem;position:relative;z-index:1}
+.fld label{font-size:.7rem;color:var(--t3);display:block;margin-bottom:.48rem;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase}
+.fld input,.fld select{width:100%;background:var(--inp);border:1px solid var(--b2);border-radius:10px;padding:.76rem 1.05rem;color:var(--t1);font-size:.9rem;font-family:'Outfit',sans-serif;outline:none;transition:border-color .25s,box-shadow .25s}
+.fld input:focus,.fld select:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(var(--ar),.12)}
+.fld input::placeholder{color:var(--t3)}
+.aswitch{text-align:center;margin-top:1.4rem;font-size:.85rem;color:var(--t2);position:relative;z-index:1}
+.aswitch a{color:var(--a);font-weight:600;cursor:pointer;transition:opacity .2s}.aswitch a:hover{opacity:.7}
+.ar{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:3rem;position:relative;overflow:hidden;background:linear-gradient(155deg,var(--bg2),var(--bg));border-left:1px solid var(--b2)}
+.avt{font-family:'Exo 2',sans-serif;font-size:2rem;font-weight:900;text-align:center;line-height:1.2;margin-bottom:2.2rem;position:relative;z-index:1}
+.avt span{background:linear-gradient(120deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.vsgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:360px;position:relative;z-index:1}
+.vsc{background:rgba(255,255,255,.04);backdrop-filter:blur(12px);border:1px solid var(--b2);border-radius:16px;padding:1.4rem 1.1rem;text-align:center;transition:all .35s cubic-bezier(.23,1,.32,1);position:relative;overflow:hidden;cursor:default}
+.vsc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(var(--ar),.1),transparent 65%);opacity:0;transition:opacity .35s}
+.vsc:hover{transform:translateY(-5px) scale(1.03);border-color:var(--b3);box-shadow:0 0 30px rgba(var(--ar),.14)}.vsc:hover::before{opacity:1}
+.vsn{font-family:'Exo 2',sans-serif;font-size:2rem;font-weight:900;margin-bottom:.25rem}
+.vsl{font-size:.72rem;color:var(--t2);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+.vsc:nth-child(1) .vsn{color:var(--a)}.vsc:nth-child(2) .vsn{color:var(--a2)}.vsc:nth-child(3) .vsn{color:var(--gold)}.vsc:nth-child(4) .vsn{color:var(--a3)}
+
+/* HERO */
+.hero{margin-bottom:2.8rem}
+.eyebrow{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--a);letter-spacing:.16em;text-transform:uppercase;margin-bottom:.7rem;display:flex;align-items:center;gap:.65rem}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--a)}
+.hero h1{font-family:'Exo 2',sans-serif;font-size:clamp(1.9rem,3.8vw,3rem);font-weight:900;letter-spacing:-.04em;line-height:1.06;margin-bottom:.7rem}
+.gw{background:linear-gradient(120deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--t2);font-size:.95rem;max-width:540px;line-height:1.75}
+
+/* STATS BAR */
+.sbar{display:flex;background:var(--surf);border:1px solid var(--b2);border-radius:16px;overflow:hidden;box-shadow:var(--cg);margin-bottom:2.2rem}
+.si{flex:1;padding:1.15rem 1.2rem;text-align:center;border-right:1px solid var(--b1);position:relative;overflow:hidden;transition:background .3s}
+.si:last-child{border-right:none}
+.si::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--ar),.07),transparent);opacity:0;transition:opacity .3s}
+.si:hover{background:rgba(var(--ar),.04)}.si:hover::before{opacity:1}
+.si:hover .sn{transform:scale(1.12) translateY(-2px)}
+.sn{font-family:'Exo 2',sans-serif;font-size:1.7rem;font-weight:900;color:var(--a);line-height:1;margin-bottom:.28rem;transition:transform .25s;display:block}
+.sl{font-size:.7rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+.holo{background:linear-gradient(120deg,var(--a) 0%,var(--a2) 25%,var(--a) 50%,var(--a2) 75%,var(--a) 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 4s linear infinite}
+
+/* SEARCH */
+.srch{display:flex;gap:.7rem;flex-wrap:wrap;background:var(--surf);border:1px solid var(--b2);border-radius:14px;padding:.9rem 1.1rem;box-shadow:var(--cg);margin-bottom:2rem;transition:border-color .3s,box-shadow .3s}
+.srch:focus-within{border-color:var(--a);box-shadow:0 0 0 3px rgba(var(--ar),.1),var(--cg)}
+.sit{flex:1;min-width:180px;background:var(--inp);border:1px solid var(--b2);border-radius:9px;padding:.62rem 1rem;color:var(--t1);font-size:.88rem;font-family:'Outfit',sans-serif;outline:none;transition:border-color .25s,box-shadow .25s}
+.sit:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(var(--ar),.1)}
+.sit::placeholder{color:var(--t3)}
+.ssel{background:var(--inp);border:1px solid var(--b2);border-radius:9px;padding:.62rem .9rem;color:var(--t1);font-size:.82rem;font-family:'Outfit',sans-serif;outline:none;transition:border-color .25s;cursor:pointer}
+.ssel:focus{border-color:var(--a)}
+
+/* COLLEGE CARDS */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.4rem}
+.ccard{background:var(--surf);border:1px solid var(--b1);border-radius:18px;padding:1.55rem;box-shadow:var(--cg);position:relative;overflow:hidden;transition:box-shadow .35s,border-color .35s;transform-style:preserve-3d;cursor:pointer;will-change:transform}
+/* shimmer sweep */
+.ccard::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(105deg,transparent,rgba(var(--ar),.06),transparent);transform:skewX(-20deg);transition:left .6s cubic-bezier(.23,1,.32,1);z-index:0;pointer-events:none}
+.ccard:hover::before{left:160%}
+/* mouse glow */
+.ccard::after{content:'';position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(var(--ar),.1),transparent 70%);left:var(--mx,50%);top:var(--my,50%);transform:translate(-50%,-50%);opacity:0;transition:opacity .4s;pointer-events:none;z-index:0}
+.ccard:hover::after{opacity:1}
+.ccard:hover{border-color:var(--b3);box-shadow:var(--cgh)}
+/* top neon bar */
+.cacc{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a),var(--a2),var(--a3));transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.23,1,.32,1);z-index:2}
+.ccard:hover .cacc{transform:scaleX(1)}
+/* corner sparks */
+.sp{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--a);opacity:0;transition:opacity .3s,transform .4s;z-index:3}
+.sp-tl{top:6px;left:6px}.sp-tr{top:6px;right:6px}.sp-bl{bottom:6px;left:6px}.sp-br{bottom:6px;right:6px}
+.ccard:hover .sp-tl{opacity:1;transform:translate(-5px,-5px)}
+.ccard:hover .sp-tr{opacity:1;transform:translate(5px,-5px)}
+.ccard:hover .sp-bl{opacity:1;transform:translate(-5px,5px)}
+.ccard:hover .sp-br{opacity:1;transform:translate(5px,5px)}
+.ccard>*{position:relative;z-index:1}
+.cch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem}
+.ccn{font-family:'Exo 2',sans-serif;font-size:1.04rem;font-weight:700;line-height:1.3;flex:1;margin-right:.5rem;transition:color .2s}
+.ccard:hover .ccn{color:var(--a)}
+.ccrk{background:rgba(var(--a2r),.12);border:1px solid rgba(var(--a2r),.25);color:var(--a2);border-radius:20px;padding:.18rem .65rem;font-size:.72rem;font-family:'DM Mono',monospace;white-space:nowrap;transition:all .25s}
+.ccard:hover .ccrk{background:rgba(var(--a2r),.22);border-color:var(--a2);box-shadow:0 0 10px rgba(var(--a2r),.25)}
+.ccm{display:flex;gap:.38rem;flex-wrap:wrap;margin-bottom:1rem}
+.tag{background:rgba(255,255,255,.05);border:1px solid var(--b1);border-radius:20px;padding:.17rem .62rem;font-size:.72rem;color:var(--t2);transition:all .25s}
+.ccard:hover .tag{border-color:var(--b2);color:var(--t1);transform:translateY(-1px)}
+/* marquee */
+.mwrap{overflow:hidden;margin-bottom:1rem;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.mtrack{display:flex;gap:.45rem;width:max-content;animation:mq 22s linear infinite}
+.ccard:hover .mtrack{animation-play-state:paused}
+@keyframes mq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.rpill{background:rgba(var(--ar),.07);border:1px solid rgba(var(--ar),.14);border-radius:20px;padding:.2rem .7rem;font-size:.7rem;color:var(--a);white-space:nowrap;font-family:'DM Mono',monospace;transition:all .2s}
+.rpill:hover{background:rgba(var(--ar),.18);border-color:var(--a);transform:translateY(-2px);box-shadow:0 0 8px rgba(var(--ar),.25)}
+.ccs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;border-top:1px solid var(--b1);padding-top:1rem;margin-bottom:1rem}
+.ccsv{font-family:'Exo 2',sans-serif;font-size:1.15rem;font-weight:800;color:var(--a);display:block;transition:transform .2s,text-shadow .3s}
+.ccard:hover .ccsv{transform:scale(1.1);text-shadow:0 0 14px rgba(var(--ar),.6)}
+.ccsl{font-size:.68rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em;margin-top:.08rem}
+/* liquid fill button */
+.vbtn{width:100%;background:transparent;border:1px solid var(--b2);border-radius:10px;padding:.62rem;color:var(--t2);font-size:.83rem;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;z-index:1}
+.vbtn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--ar),.14),rgba(var(--a2r),.12));transform:translateX(-100%);transition:transform .4s cubic-bezier(.23,1,.32,1);border-radius:10px;z-index:-1}
+.vbtn:hover{border-color:var(--a);color:var(--a)}.vbtn:hover::before{transform:translateX(0)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:none;border-radius:11px;padding:.82rem 1.7rem;font-size:.92rem;font-weight:700;font-family:'Exo 2',sans-serif;cursor:pointer;transition:all .3s;letter-spacing:.02em;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:-1px;border-radius:11px;background:inherit;filter:blur(10px);opacity:0;z-index:-1;transition:opacity .3s}
+.btn-a{background:linear-gradient(135deg,var(--a),color-mix(in srgb,var(--a) 65%,var(--a2)));color:#020810;box-shadow:0 0 24px rgba(var(--ar),.3)}
+.btn-a:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(var(--ar),.55)}.btn-a:hover::after{opacity:.65}
+.btn-b{background:linear-gradient(135deg,var(--a2),color-mix(in srgb,var(--a2) 60%,var(--a)));color:#fff;box-shadow:0 0 24px rgba(var(--a2r),.3)}
+.btn-b:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(var(--a2r),.5)}.btn-b:hover::after{opacity:.65}
+.btn-c{background:linear-gradient(135deg,var(--a3),color-mix(in srgb,var(--a3) 55%,var(--a2)));color:#fff;box-shadow:0 0 24px rgba(var(--a3r),.3)}
+.btn-c:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(var(--a3r),.5)}.btn-c:hover::after{opacity:.65}
+.btn:active{transform:translateY(0) scale(.98)}
+
+/* DETAIL */
+.back{display:inline-flex;align-items:center;gap:.48rem;color:var(--t2);font-size:.84rem;cursor:pointer;margin-bottom:1.5rem;transition:color .2s,gap .2s;font-family:'DM Mono',monospace}
+.back:hover{color:var(--a);gap:.7rem}
+.dhero{background:var(--surf);border:1px solid var(--b2);border-radius:22px;padding:2.1rem;margin-bottom:1.4rem;position:relative;overflow:hidden;box-shadow:var(--cg)}
+.dhero::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--a),var(--a2),var(--a3))}
+.dhero::after{content:'';position:absolute;top:-1px;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--a),var(--a2),var(--a3));filter:blur(6px);opacity:.8}
+.dn{font-family:'Exo 2',sans-serif;font-size:1.9rem;font-weight:900;margin-bottom:.55rem}
+.dm{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.dsts{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.dsb{background:var(--bg);border:1px solid var(--b2);border-radius:13px;padding:1.1rem;text-align:center;transition:all .3s;position:relative;overflow:hidden;cursor:default}
+.dsb::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 100%,rgba(var(--ar),.1),transparent 60%);opacity:0;transition:opacity .3s}
+.dsb:hover{border-color:var(--a);transform:translateY(-4px);box-shadow:0 0 24px rgba(var(--ar),.14)}.dsb:hover::after{opacity:1}
+.dsv{font-family:'Exo 2',sans-serif;font-size:1.75rem;font-weight:900;color:var(--a);margin-bottom:.22rem}
+.dsl{font-size:.7rem;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.tcol{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.ibox{background:var(--surf);border:1px solid var(--b2);border-radius:18px;padding:1.55rem;box-shadow:var(--cg);transition:border-color .3s}
+.ibox:hover{border-color:var(--b3)}
+.slbl{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--a);letter-spacing:.13em;text-transform:uppercase;margin-bottom:1.15rem;display:flex;align-items:center;gap:.55rem}
+.slbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--b3),transparent)}
+.trr{display:flex;align-items:center;gap:.7rem;padding:.58rem 0;border-bottom:1px solid var(--b1)}
+.trr:last-child{border-bottom:none}
+.tyr{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t2);min-width:36px}
+.ttr{flex:1;height:5px;background:var(--b1);border-radius:3px;overflow:hidden}
+.tfill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--a),var(--a2));transform-origin:left;transform:scaleX(0);transition:transform .9s cubic-bezier(.23,1,.32,1)}
+.tv{font-family:'Exo 2',sans-serif;font-weight:700;font-size:.88rem;color:var(--a);min-width:50px;text-align:right}
+.rcl{display:flex;flex-wrap:wrap;gap:.45rem}
+.rch{background:rgba(var(--a2r),.08);border:1px solid rgba(var(--a2r),.2);border-radius:20px;padding:.26rem .82rem;font-size:.78rem;color:var(--a2);font-family:'DM Mono',monospace;transition:all .25s;cursor:default}
+.rch:hover{background:rgba(var(--a2r),.2);border-color:var(--a2);transform:translateY(-2px);box-shadow:0 0 12px rgba(var(--a2r),.25)}
+
+/* PREDICTOR */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.pform{background:var(--surf);border:1px solid var(--b2);border-radius:20px;padding:2rem;box-shadow:var(--cg);position:relative;overflow:hidden}
+.pform::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a2),var(--a),var(--a2));background-size:200% auto;animation:shimmer 4s linear infinite}
+.pres{background:var(--surf);border:1px solid var(--b2);border-radius:20px;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:470px;box-shadow:var(--cg);position:relative;overflow:hidden}
+.pres::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 110%,rgba(var(--ar),.06),transparent 55%);pointer-events:none}
+.ff{margin-bottom:1.15rem}
+.ff label{font-size:.7rem;color:var(--t3);display:block;margin-bottom:.46rem;font-family:'DM Mono',monospace;letter-spacing:.09em;text-transform:uppercase}
+.ff input,.ff select{width:100%;background:var(--inp);border:1px solid var(--b2);border-radius:9px;padding:.7rem .95rem;color:var(--t1);font-size:.88rem;font-family:'Outfit',sans-serif;outline:none;transition:border-color .25s,box-shadow .25s}
+.ff input:focus,.ff select:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(var(--ar),.1)}
+.ff input::placeholder{color:var(--t3)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.chips{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.5rem;max-height:150px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(var(--ar),.3) transparent}
+.chip{background:rgba(255,255,255,.04);border:1px solid var(--b2);border-radius:20px;padding:.22rem .7rem;font-size:.7rem;color:var(--t2);cursor:pointer;transition:all .22s;font-family:'DM Mono',monospace;user-select:none;white-space:nowrap}
+.chip:hover{border-color:var(--a2);color:var(--a2);transform:translateY(-2px);box-shadow:0 0 8px rgba(var(--a2r),.15)}
+.chip.on{background:rgba(var(--a2r),.15);border-color:var(--a2);color:var(--a2);box-shadow:0 0 10px rgba(var(--a2r),.2);transform:translateY(-1px)}
+/* result */
+.orb{width:90px;height:90px;border-radius:50%;border:1.5px solid rgba(var(--ar),.35);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.4rem;background:radial-gradient(circle,rgba(var(--ar),.1),transparent);animation:porb 2.5s ease-in-out infinite}
+@keyframes porb{0%,100%{box-shadow:0 0 0 0 rgba(var(--ar),.35)}50%{box-shadow:0 0 0 18px rgba(var(--ar),0)}}
+.reb{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--t3);letter-spacing:.13em;text-transform:uppercase;margin-bottom:.55rem}
+.rctc{font-family:'Exo 2',sans-serif;font-size:2.5rem;font-weight:900;color:var(--a);line-height:1}
+.rrange{font-size:.83rem;color:var(--t2);margin:.38rem 0 1.4rem}
+.pbw{width:100%;padding:0 .5rem}
+.pbh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.45rem}
+.pbl{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.pbp{font-family:'Exo 2',sans-serif;font-size:1.25rem;font-weight:900;color:var(--a2)}
+.ptrack{width:100%;height:7px;background:var(--b1);border-radius:4px;overflow:hidden}
+.pfill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--a2),var(--a));transition:width 1.3s cubic-bezier(.23,1,.32,1);width:0%}
+.rnote{margin-top:1.4rem;font-size:.74rem;color:var(--t3);font-family:'DM Mono',monospace;line-height:1.75}
+.sbig{font-family:'Exo 2',sans-serif;font-size:3.8rem;font-weight:900;color:var(--a3);line-height:1}
+.sbadge{background:rgba(var(--a3r),.1);border:1px solid rgba(var(--a3r),.25);border-radius:20px;padding:.28rem .95rem;font-size:.8rem;color:var(--a3);display:inline-block;margin:.45rem 0 1.1rem;font-family:'DM Mono',monospace}
+.ri{background:rgba(var(--ar),.05);border:1px solid rgba(var(--ar),.14);border-radius:11px;padding:.85rem 1rem;font-size:.84rem;color:var(--t1);line-height:1.65;margin-top:.9rem;text-align:left}
+.empti{width:58px;height:58px;border-radius:50%;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 1.1rem}
+.empts{color:var(--t3);font-size:.88rem;font-family:'DM Mono',monospace;line-height:1.8}
+
+/* COMPARE */
+.cmpsels{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
+.csel{flex:1;min-width:190px;background:var(--inp);border:1px solid var(--b2);border-radius:9px;padding:.68rem .95rem;color:var(--t1);font-family:'Outfit',sans-serif;font-size:.86rem;outline:none;transition:border-color .25s;cursor:pointer}
+.csel:focus{border-color:var(--a)}
+.cmpt{width:100%;border-collapse:separate;border-spacing:0;border-radius:18px;overflow:hidden;border:1px solid var(--b2)}
+.cmpt th{background:var(--surf2);padding:.95rem 1.2rem;text-align:left;font-family:'DM Mono',monospace;font-size:.7rem;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--b2)}
+.cmpt td{padding:.85rem 1.2rem;border-bottom:1px solid var(--b1);font-size:.87rem;background:var(--surf);transition:background .2s}
+.cmpt tr:hover td{background:rgba(var(--ar),.025)}.cmpt tr:last-child td{border-bottom:none}
+.cmpt td:first-child{color:var(--t3);font-size:.75rem;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.cv{font-family:'Exo 2',sans-serif;font-weight:800;color:var(--a)}
+.cb{background:rgba(var(--ar),.05)!important}.cb .cv{text-shadow:0 0 10px rgba(var(--ar),.4)}
+.nirfb{background:rgba(var(--goldr),.1);border:1px solid rgba(var(--goldr),.25);color:var(--gold);border-radius:20px;padding:.14rem .52rem;font-size:.7rem;font-family:'DM Mono',monospace}
+
+/* NEWS */
+.nhero{background:var(--surf);border:1px solid var(--b2);border-radius:22px;padding:2rem 2.2rem;margin-bottom:2rem;position:relative;overflow:hidden;box-shadow:var(--cg)}
+.nhero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--a),var(--a2))}
+.nhero::after{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--a),var(--a2));filter:blur(5px)}
+.ndb{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.5rem}
+.ndl{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold);letter-spacing:.14em;text-transform:uppercase}
+.ndv{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t2)}
+.nhl{font-family:'Exo 2',sans-serif;font-size:1.7rem;font-weight:900;line-height:1.2;margin-bottom:.7rem}
+.nhl span{color:var(--a)}
+.nlead{color:var(--t2);font-size:.93rem;line-height:1.75;max-width:680px;margin-bottom:1.5rem}
+.ntags{display:flex;gap:.5rem;flex-wrap:wrap}
+.ntag{background:rgba(var(--goldr),.1);border:1px solid rgba(var(--goldr),.22);color:var(--gold);border-radius:20px;padding:.2rem .7rem;font-size:.72rem;font-family:'DM Mono',monospace;transition:all .25s}
+.ntag:hover{background:rgba(var(--goldr),.2);transform:translateY(-2px);box-shadow:0 0 10px rgba(var(--goldr),.2)}
+.ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:1.5rem}
+.ncard{background:var(--surf);border:1px solid var(--b1);border-radius:16px;padding:1.4rem;transition:all .35s;position:relative;overflow:hidden;cursor:pointer}
+/* shimmer on news cards */
+.ncard::before{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(105deg,transparent,rgba(var(--goldr),.06),transparent);transform:skewX(-18deg);transition:left .55s;pointer-events:none;z-index:0}
+.ncard:hover::before{left:160%}
+/* glow spot */
+.ncard::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(var(--ar),.07),transparent 70%);left:var(--mx,50%);top:var(--my,50%);transform:translate(-50%,-50%);opacity:0;transition:opacity .4s;pointer-events:none;z-index:0}
+.ncard:hover::after{opacity:1}
+.ncard:hover{border-color:var(--b3);transform:translateY(-5px) scale(1.01);box-shadow:0 0 35px rgba(var(--ar),.12)}
+.ncard>*{position:relative;z-index:1}
+.ncard:hover .ncn{color:var(--a)}
+.nccat{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--a);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem}
+.nccat::before{content:'';width:18px;height:1px;background:var(--a);transition:width .3s}
+.ncard:hover .nccat::before{width:30px}
+.ncn{font-family:'Exo 2',sans-serif;font-size:.98rem;font-weight:700;line-height:1.35;margin-bottom:.6rem;transition:color .2s}
+.ncp{font-size:.82rem;color:var(--t2);line-height:1.65}
+.ncft{display:flex;align-items:center;justify-content:space-between;margin-top:.9rem;padding-top:.75rem;border-top:1px solid var(--b1)}
+.ncts{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--t3)}
+.ncrd{font-size:.72rem;color:var(--a);font-weight:500;display:flex;align-items:center;gap:.3rem;transition:gap .2s}
+.ncard:hover .ncrd{gap:.55rem}
+.nfeat{grid-column:span 2}
+.ticker{background:var(--surf2);border:1px solid var(--b2);border-radius:12px;padding:.7rem 1.2rem;margin-bottom:2rem;display:flex;align-items:center;gap:1rem;overflow:hidden}
+.tklbl{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--a);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;border-right:1px solid var(--b2);padding-right:1rem;display:flex;align-items:center;gap:.4rem}
+.tktrack{display:flex;gap:2.5rem;animation:tk 30s linear infinite;width:max-content}
+.tki{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t2);white-space:nowrap;display:flex;align-items:center;gap:.5rem}
+.tkup{color:var(--a)}.tkdn{color:var(--a3)}
+@keyframes tk{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.nside{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.trc{background:var(--surf);border:1px solid var(--b1);border-radius:14px;padding:1.2rem;transition:all .3s;position:relative;overflow:hidden;cursor:default}
+.trc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--a),var(--a2));transform:scaleY(0);transform-origin:top;transition:transform .4s}
+.trc:hover{border-color:var(--b3);transform:translateX(5px);box-shadow:0 0 20px rgba(var(--ar),.08)}.trc:hover::before{transform:scaleY(1)}
+.trcn{font-family:'Exo 2',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.3rem;transition:color .2s}
+.trc:hover .trcn{color:var(--a)}
+.trcp{font-size:.8rem;color:var(--t2);line-height:1.6}
+.trci{font-size:1.4rem;margin-bottom:.5rem}
+
+/* FOOTER */
+footer{position:relative;z-index:10;border-top:1px solid var(--b1);padding:1.4rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.ftbrand{font-family:'Exo 2',sans-serif;font-size:1.1rem;font-weight:900;background:linear-gradient(120deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ftby{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.ftby span{color:var(--a);transition:color .2s}.ftby span:hover{color:var(--a2)}
+.ftlinks{display:flex;gap:1.2rem}
+.ftlnk{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--t3);cursor:pointer;transition:color .2s;position:relative}
+.ftlnk::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:var(--a);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+.ftlnk:hover{color:var(--a)}.ftlnk:hover::after{transform:scaleX(1)}
+
+/* SCAN LINE */
+.scan{position:relative;overflow:hidden}
+.scan::after{content:'';position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,rgba(var(--ar),.55),transparent);top:-2px;animation:none;pointer-events:none;z-index:5}
+.scan:hover::after{animation:scl 1.6s ease-in-out infinite}
+@keyframes scl{0%{top:-2px}100%{top:calc(100% + 2px)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--surf2);border:1px solid var(--a);border-radius:12px;padding:.82rem 1.4rem;color:var(--t1);font-size:.84rem;z-index:1000;transform:translateY(20px) scale(.95);opacity:0;transition:all .35s cubic-bezier(.23,1,.32,1);box-shadow:0 0 32px rgba(var(--ar),.25);font-family:'DM Mono',monospace}
+.toast.show{transform:translateY(0) scale(1);opacity:1}
+
+@media(max-width:768px){.ar{display:none}.dsts{grid-template-columns:1fr 1fr}.pgrid{grid-template-columns:1fr}.tcol{grid-template-columns:1fr}.ngrid{grid-template-columns:1fr}.nfeat{grid-column:span 1}.nside{grid-template-columns:1fr}}
+/* Force side‑by‑side layout for Placement AI */
+#tc-pred .pgrid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.5rem !important;
+    align-items: start !important;
+}
+
+/* Ensure the containers don't overflow */
+#tc-pred .pform,
+#tc-pred .pres {
+    min-width: 0; /* prevents overflow */
+    width: 100%;
+}
+.favorite-star {
+    transition: transform 0.2s, color 0.2s;
+    display: inline-block;
+}
+.favorite-star:hover {
+    transform: scale(1.2);
+    color: var(--gold) !important;
+}
+</style>
+</head>
+<body>
+<div id="cur"></div><div id="curR"></div><div id="curT"></div>
+<canvas id="bgc"></canvas><div class="grid"></div><div class="noise"></div>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="page active" id="pg-login">
+<div class="awrap">
+  <div class="al">
+    <div class="abrand">PlaceIQ</div>
+    <div class="atag">// by Ritesh Kumar Singh · placement intelligence engine</div>
+    <div class="acard scan">
+      <div class="sweep"></div>
+      <div class="ah">Access Terminal</div>
+      <div class="asub">Sign in to unlock the full placement intelligence suite. Your data. Your future.</div>
+      <div class="fld"><label>Neural ID (Email)</label><input id="le" type="email" placeholder="you@example.com"/></div>
+      <div class="fld"><label>Access Code</label><input id="lp" type="password" placeholder="••••••••"/></div>
+      <button class="btn btn-a" style="width:100%;margin-top:.4rem" onclick="doLogin()">Initialize Session →</button>
+      <div style="text-align:center;margin-top:.9rem;font-size:.7rem;font-family:'DM Mono',monospace;color:var(--t3)">// demo: any email + any password</div>
+      <div class="aswitch">No profile? <a onclick="showPg('pg-reg')">Register identity →</a></div>
+    </div>
+    <button class="thbtn" id="ltbtn" onclick="toggleTheme()" style="margin-top:1.5rem">🌙</button>
+  </div>
+  <div class="ar">
+    <div class="avt">Predict your <span>placement future</span><br/>before you even apply</div>
+    <div class="vsgrid">
+      <div class="vsc"><div class="vsn" data-cnt="500" data-sfx="+">0+</div><div class="vsl">Colleges tracked</div></div>
+      <div class="vsc"><div class="vsn" data-cnt="95" data-sfx="%">0%</div><div class="vsl">Prediction accuracy</div></div>
+      <div class="vsc"><div class="vsn" data-cnt="36" data-sfx="L">0L</div><div class="vsl">Highest avg CTC</div></div>
+      <div class="vsc"><div class="vsn" data-cnt="2" data-sfx="M+">0M+</div><div class="vsl">Students helped</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ REGISTER ═══ -->
+<div class="page" id="pg-reg">
+<div class="awrap">
+  <div class="al">
+    <div class="abrand">PlaceIQ</div>
+    <div class="atag">// create your intelligence profile · by Ritesh Kumar Singh</div>
+    <div class="acard scan">
+      <div class="sweep"></div>
+      <div class="ah">Initialize Profile</div>
+      <div class="asub">Join the network. Unlock data-driven career decisions tailored to your profile. You'll be redirected to sign in after registration.</div>
+      <div class="fld"><label>Full Name</label><input id="rn" type="text" placeholder="Rahul Sharma"/></div>
+      <div class="fld"><label>Email Address</label><input id="re" type="email" placeholder="you@example.com"/></div>
+      <div class="fld"><label>Stream</label>
+        <select id="rs"><option value="">Select your stream</option><option>Engineering (B.Tech)</option><option>MBA / Management</option><option>M.Tech / MS</option><option>MCA</option></select>
+      </div>
+      <div class="fld"><label>Password</label><input id="rp" type="password" placeholder="Create a strong password"/></div>
+      <button class="btn btn-b" style="width:100%;margin-top:.4rem" onclick="doReg()">Create Profile →</button>
+      <div class="aswitch">Already initialized? <a onclick="showPg('pg-login')">Sign in →</a></div>
+    </div>
+  </div>
+  <div class="ar">
+    <div class="avt"><span>Data-driven</span> decisions<br/>for a smarter career</div>
+    <div class="vsgrid">
+      <div class="vsc"><div class="vsn" data-cnt="500" data-sfx="+">0+</div><div class="vsl">Colleges tracked</div></div>
+      <div class="vsc"><div class="vsn" data-cnt="95" data-sfx="%">0%</div><div class="vsl">Prediction accuracy</div></div>
+      <div class="vsc"><div class="vsn" data-cnt="36" data-sfx="L">0L</div><div class="vsl">Highest avg CTC</div></div>
+      <div class="vsc"><div class="vsn" data-cnt="2" data-sfx="M+">0M+</div><div class="vsl">Students helped</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+<div class="page" id="pg-app">
+  <nav>
+    <div class="nbrand" onclick="goTab('home')">PlaceIQ</div>
+    <div class="nlinks">
+      <div class="nl active" id="nl-home"    onclick="goTab('home')">⬡ Colleges</div>
+      <div class="nl"        id="nl-news"    onclick="goTab('news')">📰 Weekly Digest</div>
+      <div class="nl"        id="nl-pred"    onclick="goTab('pred')">◈ Placement AI</div>
+      <div class="nl"        id="nl-score"   onclick="goTab('score')">◉ Score Oracle</div>
+      <div class="nl"        id="nl-compare" onclick="goTab('compare')">⊞ Compare</div>
+      <div class="nl"        id="nl-resume"   onclick="goTab('resume')">📄 Resume AI</div>
+      <div class="nl" id="nl-dashboard" onclick="goTab('dashboard')">📊 Dashboard</div>
+      <div class="nl"        id="nl-help"    onclick="goTab('help')">❓ Help</div>
+    </div>
+    <div class="navr">
+      <button class="thbtn" title="Take a tour" onclick="startTour()" style="font-size:.75rem;width:auto;padding:0 .7rem;gap:.3rem;display:flex;align-items:center">🗺 Tour</button>
+      <button class="thbtn" id="thbtn" onclick="toggleTheme()">🌙</button>
+      <span class="nusr" id="nusr"></span>
+      <button class="lbtn" onclick="doLogout()">⏻ Exit</button>
+    </div>
+  </nav>
+  <div class="abody">
+    <main>
+      <!-- HOME -->
+      <div class="tab active" id="tc-home">
+        <div class="hero">
+          <div class="eyebrow">College Discovery Engine</div>
+          <h1>Find Your <span class="gw">Dream College</span><br/>Before Others Do</h1>
+          <p>Real-time placement intelligence across 500+ institutions. Filter, predict, compare — all in one terminal.</p>
+        </div>
+        <div class="sbar">
+          <div class="si"><span class="sn holo">500+</span><div class="sl">Colleges</div></div>
+          <div class="si"><span class="sn holo">95%</span><div class="sl">Accuracy</div></div>
+          <div class="si"><span class="sn holo">₹36L</span><div class="sl">Peak Avg CTC</div></div>
+          <div class="si"><span class="sn holo">LIVE</span><div class="sl">Data Feed</div></div>
+        </div>
+        <div class="srch">
+          <input class="sit" id="sq" placeholder="🔍  Search college, city, stream…" oninput="filterC()"/>
+          <input type="text" id="ss" class="sit" placeholder="Search stream..." list="stream-list" autocomplete="off" oninput="filterC()" style="min-width:150px">
+<datalist id="stream-list"></datalist>
+
+<input type="text" id="sst" class="sit" placeholder="Search state..." list="state-list" autocomplete="off" oninput="filterC()" style="min-width:150px">
+<datalist id="state-list"></datalist>
+          <select class="ssel" id="sf" onchange="filterC()"><option value="">Any Fees</option><option value="low">Under ₹5L/yr</option><option value="mid">₹5–12L/yr</option><option value="high">₹12L+/yr</option></select>
+        </div>
+        <div class="cgrid" id="cgrid"></div>
+      </div>
+      <!-- DETAIL -->
+      <div class="tab" id="tc-detail">
+        <div class="back" onclick="goTab('home')">← Return to Grid</div>
+        <div id="detbody"></div>
+      </div>
+          <div class="tab" id="tc-news">
+  <div class="hero">
+    <div class="eyebrow">Weekly Intelligence Digest</div>
+    <h1>Placement <span class="gw">Pulse</span> —<br/>This Week's Intel</h1>
+    <p>Curated placement news, salary trends, company moves, and campus buzz — every week, decoded for you.</p>
+  </div>
+
+  <!-- Dynamic RSS News Section -->
+  <div id="rss-news" class="ngrid"></div>
+
+  <div class="eyebrow" style="margin-bottom:1rem">📈 Trending Colleges</div>
+
+  <!-- Ticker -->
+  <div class="ticker">
+    <div class="tklbl">⚡ live feed</div>
+    <div class="tktrack" id="tktrack"></div>
+  </div>
+
+  <!-- Main news hero -->
+  <div class="nhero scan">
+    <div class="ndb"><span class="ndl">⬡ PlaceIQ Digest — Vol. 12</span><span class="ndv" id="curdate"></span></div>
+    <div class="nhl">Tech hiring <span>surges 34%</span> in Q1 2025 —<br/>IITs & NITs see record avg CTCs</div>
+    <div class="nlead">After a turbulent 2024 with layoffs dominating headlines, campus placements have roared back. Companies across product, fintech, and AI sectors are competing fiercely for top talent — driving median packages at Tier-1 institutes to all-time highs. This week's digest breaks down which domains are hiring, which are cooling, and what it means for your strategy.</div>
+    <div class="ntags"><span class="ntag">📈 Tech Hiring</span><span class="ntag">🏦 Finance</span><span class="ntag">🤖 AI/ML Jobs</span><span class="ntag">🎓 IIT Trends</span><span class="ntag">📍 Bengaluru Hub</span></div>
+  </div>
+
+  <!-- Static news cards -->
+  <div class="ngrid">
+    <div class="ncard nfeat">
+      <div class="nccat">🔥 Cover Story</div>
+      <div class="ncn">Google, Microsoft & Meta to double India campus hiring in FY26 — sources</div>
+      <div class="ncp">Three of the world's largest tech companies have quietly signalled intent to expand their India campus programs. With talent wars intensifying around AI-native engineers, IIT Bombay, Delhi, and Hyderabad are expected to see outsized offers — with CTCs crossing ₹50L for specialized roles in systems and ML infrastructure.</div>
+      <div class="ncft"><span class="ncts">// Mar 25, 2025 · 4 min</span><span class="ncrd">Read more →</span></div>
+    </div>
+    <div class="ncard">
+      <div class="nccat">📊 Salary Trends</div>
+      <div class="ncn">Data Science CTCs hit ₹22L average — up 18% YoY</div>
+      <div class="ncp">The AI/ML job market is defying the broader slowdown. Freshers with PyTorch and LLM fine-tuning skills are commanding premiums of 35–40% over traditional software roles.</div>
+      <div class="ncft"><span class="ncts">// Mar 22, 2025 · 3 min</span><span class="ncrd">Read more →</span></div>
+    </div>
+    <div class="ncard">
+      <div class="nccat">🏛️ Institute News</div>
+      <div class="ncn">IIM Ahmedabad breaks own record — median CTC ₹36L in 2025</div>
+      <div class="ncp">For the 6th consecutive year, IIM-A has shattered its own placement benchmark. Consulting continues to dominate, but product management and PE/VC roles are fast catching up.</div>
+      <div class="ncft"><span class="ncts">// Mar 20, 2025 · 2 min</span><span class="ncrd">Read more →</span></div>
+    </div>
+    <div class="ncard">
+      <div class="nccat">🌍 Global Moves</div>
+      <div class="ncn">Quant trading firms — Jane Street, Optiver expanding IIT presence</div>
+      <div class="ncp">High-frequency and algorithmic trading firms are aggressively recruiting from IIIT-H and IITs, offering packages north of ₹1.5Cr for quant researcher and SWE roles.</div>
+      <div class="ncft"><span class="ncts">// Mar 19, 2025 · 3 min</span><span class="ncrd">Read more →</span></div>
+    </div>
+    <div class="ncard">
+      <div class="nccat">⚠️ Market Watch</div>
+      <div class="ncn">Core engineering placements lag as IT sector recovers unevenly</div>
+      <div class="ncp">While software hiring rebounds strongly, mechanical, civil, and electrical branches face slower recovery. PSUs and infra companies remain key absorbers.</div>
+      <div class="ncft"><span class="ncts">// Mar 18, 2025 · 2 min</span><span class="ncrd">Read more →</span></div>
+    </div>
+    <div class="ncard">
+      <div class="nccat">🎯 GATE Insight</div>
+      <div class="ncn">GATE 2025 CSE cutoff for IISc predicted at 65+ — highest in 5 years</div>
+      <div class="ncp">With a record 1.1L CSE aspirants, competition has never been fiercer. Scores of 75+ now needed for IIT MTech seats in top specialisations.</div>
+      <div class="ncft"><span class="ncts">// Mar 17, 2025 · 2 min</span><span class="ncrd">Read more →</span></div>
+    </div>
+  </div>
+
+  <!-- Trending this week section (only one) -->
+  <div class="eyebrow" style="margin-bottom:1rem">📡 Trending this week</div>
+  <div class="nside">
+    <div class="trc"><div class="trci">🤖</div><div class="trcn">AI/ML Engineer</div><div class="trcp">Demand up 62% MoM. GenAI skills (LangChain, RAG, fine-tuning) commanding ₹18–35L at product companies.</div></div>
+    <div class="trc"><div class="trci">☁️</div><div class="trcn">Cloud & DevOps</div><div class="trcp">AWS + Kubernetes proficiency now table stakes. SRE freshers at Tier-1 institutes hitting ₹20L+ from Google, Flipkart.</div></div>
+    <div class="trc"><div class="trci">📱</div><div class="trcn">Product Management</div><div class="trcp">MBA PMs from IIM-A/B/C averaging ₹28L. Startups offering ESOPs bridging gap with MNCs.</div></div>
+    <div class="trc"><div class="trci">🔐</div><div class="trcn">Cybersecurity</div><div class="trcp">Fastest growing niche. CEH + cloud security profiles seeing 45% YoY package growth across BFSI and IT.</div></div>
+    <div class="trc"><div class="trci">📊</div><div class="trcn">Data Engineering</div><div class="trcp">Spark, dbt, Airflow expertise in demand. Mid-tier colleges with strong data stacks seeing ₹14–18L offers.</div></div>
+    <div class="trc"><div class="trci">⚡</div><div class="trcn">Embedded Systems</div><div class="trcp">Automotive & semiconductor revival. VLSI freshers at Texas Instruments, Qualcomm averaging ₹16L.</div></div>
+  </div>
+</div>
+<!-- PRED -->
+<div class="tab" id="tc-pred">
+  <div class="hero">
+    <div class="eyebrow">Placement Intelligence Engine</div>
+    <h1><span class="gw">AI Predictor</span> —<br/>Your CTC Forecast</h1>
+    <p>Adjust the sliders below to see how your profile affects your expected CTC and placement probability.</p>
+  </div>
+
+  <div class="pgrid">
+    <!-- Left Panel: Controls -->
+    <div class="pform scan" id="predictor-controls">
+      <div class="ff">
+        <label>Branch / Specialization</label>
+        <select id="pb" onchange="updatePrediction()">
+          <option>Computer Science (CSE)</option>
+          <option>Electronics (ECE)</option>
+          <option>Mechanical (ME)</option>
+          <option>Civil (CE)</option>
+          <option>Data Science / AI</option>
+          <option>Cybersecurity</option>
+          <option>MBA — Finance</option>
+          <option>MBA — Marketing</option>
+        </select>
+      </div>
+
+      <!-- CGPA Slider -->
+      <div class="ff">
+        <label>CGPA (out of 10) — <span id="cgpa-value">7.0</span></label>
+        <input type="range" id="pcgpa" min="4" max="10" step="0.1" value="7.0" oninput="updatePrediction()">
+      </div>
+
+      <!-- College Tier Slider -->
+      <div class="ff">
+        <label>College Tier — <span id="tier-value">Tier 2</span></label>
+        <input type="range" id="ptier" min="1" max="3" step="1" value="2" oninput="updatePrediction()">
+      </div>
+
+      <!-- Backlogs -->
+      <div class="ff">
+        <label>Active Backlogs</label>
+        <select id="pbl" onchange="updatePrediction()">
+          <option value="0">None</option>
+          <option value="1">1 backlog</option>
+          <option value="2">2 backlogs</option>
+          <option value="3">3+ backlogs</option>
+        </select>
+      </div>
+
+      <!-- Internships Slider -->
+      <div class="ff">
+        <label>Internships — <span id="intern-value">0</span></label>
+        <input type="range" id="pin" min="0" max="3" step="1" value="0" oninput="updatePrediction()">
+      </div>
+
+      <!-- Skills Section -->
+      <div class="ff">
+        <label>Tech Stack — search & select (100+ skills)</label>
+        <input type="text" id="skill-search" class="sit" placeholder="Search skills (e.g., Python, Excel, Communication)" oninput="filterSkills()" style="margin-bottom:0.5rem">
+        <div class="chips" id="skills-container"></div>
+      </div>
+
+      <!-- Resume Upload Section -->
+      <div class="ff" style="margin-top:0.5rem">
+        <label>📄 Upload resume (PDF) or paste text</label>
+        <input type="file" id="placement-resume-file" accept=".pdf" style="background:var(--inp); border:1px solid var(--b2); border-radius:9px; padding:.7rem; color:var(--t1); width:100%">
+        <textarea id="placement-resume-text" rows="2" placeholder="Or paste resume text here..." style="margin-top:0.5rem; background:var(--inp); border:1px solid var(--b2); border-radius:9px; padding:.7rem; color:var(--t1); width:100%"></textarea>
+        <button class="btn btn-a" style="width:100%; margin-top:0.5rem" onclick="analyzeResumeForPlacement()">🔍 Analyze Resume & Predict</button>
+      </div>
+
+      <!-- Auto-fill from Resume button -->
+      <button class="btn btn-a" style="width:100%; margin-bottom:0.5rem" onclick="autoFillFromResume()">📄 Auto-fill from Resume</button>
+      <div style="font-size:0.7rem; text-align:center; color:var(--t3); margin-bottom:1rem">Upload a resume in Resume AI tab first, then click here.</div>
+
+      <button class="btn btn-b" style="width:100%" onclick="predictP()">⚡ Run Prediction Model</button>
+    </div>
+
+    <!-- Right Panel: Results -->
+    <div class="pres" id="pres">
+      <canvas id="placement-gauge" width="200" height="100" style="width:200px; height:100px; margin:0 auto"></canvas>
+      <div class="reb">Expected CTC Range</div>
+      <div class="rctc" id="ctc-range">₹0L – ₹0L</div>
+      <div class="rrange" id="skill-count">0 skills selected</div>
+      <div class="pbw">
+        <div class="pbh"><span class="pbl">Placement probability</span><span class="pbp" id="prob-value">0%</span></div>
+        <div class="ptrack"><div class="pfill" id="pfill" style="width:0%"></div></div>
+      </div>
+      <div id="historical-compare" class="ri" style="margin-top:0.8rem; display:none"></div>
+      <div id="college-recommendations" class="ri" style="margin-top:0.8rem; display:none"></div>
+      <div id="actionable-tips" class="ri" style="margin-top:0.8rem; display:none"></div>
+      <div class="rnote">// model: CGPA × tier × skills × internship signals</div>
+      <div id="skill-gap" class="ri" style="margin-top:0.8rem; display:none">
+    <strong style="color:var(--gold)">🎯 Skill Gap Analysis</strong>
+    <div id="skill-gap-content"></div>
+</div>
+
+<div id="certifications" class="ri" style="margin-top:0.8rem; display:none">
+    <strong style="color:var(--a2)">📜 Recommended Certifications</strong>
+    <div id="cert-content"></div>
+</div>
+
+<div id="roadmap" class="ri" style="margin-top:0.8rem; display:none">
+    <strong style="color:var(--a)">🚀 Personalized Roadmap</strong>
+    <div id="roadmap-content"></div>
+</div>
+
+<div id="projects" class="ri" style="margin-top:0.8rem; display:none">
+    <strong style="color:var(--a3)">💡 Suggested Projects</strong>
+    <div id="projects-content"></div>
+</div>
+    </div>
+  </div>
+</div>
+      <!-- SCORE -->
+      <div class="tab" id="tc-score">
+        <div class="hero">
+          <div class="eyebrow">Exam Score Intelligence</div>
+          <h1>GATE & CAT <span class="gw">Score Oracle</span></h1>
+          <p>Predict your entrance exam score using prep data, mock performance, and subject mastery signals.</p>
+        </div>
+        <div class="pgrid">
+          <div class="pform scan">
+            <div class="ff"><label>Target Exam</label><select id="se"><option>GATE (CSE)</option><option>GATE (ECE)</option><option>GATE (ME)</option><option>GATE (CE)</option><option>CAT</option><option>CUET PG</option></select></div>
+            <div class="frow">
+              <div class="ff"><label>Avg mock score (%)</label><input type="number" id="smock" placeholder="65" min="0" max="100"/></div>
+              <div class="ff"><label>Months of prep</label><input type="number" id="smon" placeholder="6" min="1" max="24"/></div>
+            </div>
+            <div class="ff">
+              <label>Strong subjects — tap to select</label>
+              <div class="chips" id="subchips">
+                <span class="chip" onclick="tog(this)">Data Structures</span><span class="chip" onclick="tog(this)">Algorithms</span><span class="chip" onclick="tog(this)">Operating Systems</span><span class="chip" onclick="tog(this)">DBMS</span><span class="chip" onclick="tog(this)">Computer Networks</span><span class="chip" onclick="tog(this)">Theory of Computation</span><span class="chip" onclick="tog(this)">Compiler Design</span><span class="chip" onclick="tog(this)">Computer Organization</span><span class="chip" onclick="tog(this)">Digital Logic</span><span class="chip" onclick="tog(this)">Discrete Maths</span><span class="chip" onclick="tog(this)">Linear Algebra</span><span class="chip" onclick="tog(this)">Probability & Stats</span><span class="chip" onclick="tog(this)">Engineering Maths</span><span class="chip" onclick="tog(this)">Verbal Ability</span><span class="chip" onclick="tog(this)">Quantitative Aptitude</span><span class="chip" onclick="tog(this)">LRDI</span>
+              </div>
+            </div>
+            <div class="frow">
+              <div class="ff"><label>Practice tests taken</label><select id="stests"><option value="3">20+ full tests</option><option value="2">10–20 tests</option><option value="1">5–10 tests</option><option value="0">Fewer than 5</option></select></div>
+              <div class="ff"><label>Study mode</label><select id="scoach"><option value="1">Coaching institute</option><option value="0.5">Online courses</option><option value="0">Pure self study</option></select></div>
+            </div>
+            <button class="btn btn-c" style="width:100%;margin-top:1rem" onclick="predictS()">🎯 Predict My Score</button>
+          </div>
+          <div class="pres" id="sres"><div class="empti" style="border-color:rgba(var(--a3r),.3)">◉</div><div class="empts">Fill your prep details<br/>and launch the oracle</div></div>
+        </div>
+      </div>
+      <!-- COMPARE -->
+      <div class="tab" id="tc-compare">
+        <div class="hero">
+          <div class="eyebrow">Side-by-Side Intelligence</div>
+          <h1>Compare <span class="gw">Head-to-Head</span></h1>
+          <p>Stack up to 4 colleges on every placement metric. Best values auto-highlight in neon.</p>
+        </div>
+        <div class="cmpsels" id="cmpsels"></div>
+        <div id="cmptable"></div>
+      </div>
+      <!-- HELP -->
+      <div class="tab" id="tc-help">
+        <div class="hero">
+          <div class="eyebrow">Support & Contact</div>
+          <h1>Need <span class="gw">Help?</span></h1>
+          <p>Reach out to the creator directly — for questions, feedback, or just to connect.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem;margin-bottom:2rem">
+          <div class="ibox scan" style="display:flex;flex-direction:column;gap:1rem">
+            <div class="slbl">👤 Creator</div>
+            <div style="font-family:'Exo 2',sans-serif;font-size:1.5rem;font-weight:800;background:linear-gradient(120deg,var(--a),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Ritesh Kumar Singh</div>
+            <div style="color:var(--t2);font-size:.9rem;line-height:1.75">Builder of PlaceIQ — a placement intelligence platform designed to help students make data-driven career decisions. B.Tech student at GLBITM.</div>
+          </div>
+          <div class="ibox scan" style="display:flex;flex-direction:column;gap:1rem">
+            <div class="slbl">📞 Phone</div>
+            <a href="tel:+917755866200" style="font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:600;color:var(--a);text-decoration:none;transition:opacity .2s" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">+91 77558 662XX</a>
+            <div style="color:var(--t3);font-size:.82rem">Available Mon–Sat · 10AM – 8PM IST</div>
+          </div>
+          <div class="ibox scan" style="display:flex;flex-direction:column;gap:1rem">
+            <div class="slbl">📧 Email</div>
+            <a href="mailto:csds23134@glbitm.ac.in" style="font-family:'DM Mono',monospace;font-size:.95rem;font-weight:600;color:var(--a);text-decoration:none;word-break:break-all;transition:opacity .2s" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">csds23134@glbitm.ac.in</a>
+            <div style="color:var(--t3);font-size:.82rem">Typically responds within 24 hours</div>
+          </div>
+          <div class="ibox scan" style="display:flex;flex-direction:column;gap:1rem">
+            <div class="slbl">🏫 Institution</div>
+            <div style="font-family:'Exo 2',sans-serif;font-size:1rem;font-weight:700;color:var(--t1)">GL Bajaj Institute of Technology & Management</div>
+            <div style="color:var(--t2);font-size:.85rem">Greater Noida, Uttar Pradesh · GLBITM</div>
+          </div>
+          <div class="ibox scan" style="display:flex;flex-direction:column;gap:1rem">
+  <div class="slbl">🌐 Social Media</div>
+  <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center">
+    <a href="https://www.linkedin.com/in/ritesh-kumar-singh-69b636322/" target="_blank" style="display:flex; align-items:center; gap:0.5rem; color:var(--a); text-decoration:none; transition:opacity 0.2s" onmouseenter="this.style.opacity='0.7'" onmouseleave="this.style.opacity='1'">
+      🔗 LinkedIn
+    </a>
+    <a href="https://github.com/Riteshkumarsingh1" target="_blank" style="display:flex; align-items:center; gap:0.5rem; color:var(--a); text-decoration:none; transition:opacity 0.2s" onmouseenter="this.style.opacity='0.7'" onmouseleave="this.style.opacity='1'">
+      🐙 GitHub
+    </a>
+    <a href="https://twitter.com/ritesh_singh" target="_blank" style="display:flex; align-items:center; gap:0.5rem; color:var(--a); text-decoration:none; transition:opacity 0.2s" onmouseenter="this.style.opacity='0.7'" onmouseleave="this.style.opacity='1'">
+      🐦 Twitter
+    </a>
+    <a href="https://riteshkumarsingh.com" target="_blank" style="display:flex; align-items:center; gap:0.5rem; color:var(--a); text-decoration:none; transition:opacity 0.2s" onmouseenter="this.style.opacity='0.7'" onmouseleave="this.style.opacity='1'">
+      🌐 Portfolio
+    </a>
+  </div>
+  <div style="color:var(--t2); font-size:.85rem; text-align:center">Connect with the creator for feedback, collaborations, or just to say hi!</div>
+</div>
+        </div>
+        <div class="ibox scan" style="margin-bottom:2rem">
+          <div class="slbl" style="margin-bottom:1rem">❓ Frequently Asked Questions</div>
+          <div style="display:flex;flex-direction:column;gap:.8rem">
+            <details style="border:1px solid var(--b2);border-radius:10px;padding:.8rem 1rem;cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'">
+              <summary style="color:var(--t1);font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between">How accurate is the Placement AI Predictor? <span style="color:var(--a)">+</span></summary>
+              <p style="color:var(--t2);font-size:.85rem;line-height:1.7;margin-top:.7rem">The predictor uses a statistical model based on CGPA, college tier, internship experience, backlogs, and skill count. It provides a range estimate with ~85–90% directional accuracy. For exact figures, consult your college placement cell.</p>
+            </details>
+            <details style="border:1px solid var(--b2);border-radius:10px;padding:.8rem 1rem;cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'">
+              <summary style="color:var(--t1);font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between">How do I use the Score Oracle? <span style="color:var(--a)">+</span></summary>
+              <p style="color:var(--t2);font-size:.85rem;line-height:1.7;margin-top:.7rem">Navigate to the Score Oracle tab, select your target exam (GATE/CAT/CUET), enter your average mock score, months of preparation, tap on your strong subjects, and hit Predict. You'll get a score range and institute eligibility.</p>
+            </details>
+            <details style="border:1px solid var(--b2);border-radius:10px;padding:.8rem 1rem;cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'">
+              <summary style="color:var(--t1);font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between">Can I compare more than 4 colleges? <span style="color:var(--a)">+</span></summary>
+              <p style="color:var(--t2);font-size:.85rem;line-height:1.7;margin-top:.7rem">Currently the Compare tool supports up to 4 colleges side-by-side. This covers the most common decision-making scenarios. Multi-set comparison is on the roadmap.</p>
+            </details>
+            <details style="border:1px solid var(--b2);border-radius:10px;padding:.8rem 1rem;cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'">
+              <summary style="color:var(--t1);font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between">Is my data stored anywhere? <span style="color:var(--a)">+</span></summary>
+              <p style="color:var(--t2);font-size:.85rem;line-height:1.7;margin-top:.7rem">PlaceIQ runs entirely in your browser session. No data is sent to any server. Your profile exists only until you close the tab — purely client-side for now.</p>
+            </details>
+            <details style="border:1px solid var(--b2);border-radius:10px;padding:.8rem 1rem;cursor:pointer;transition:border-color .2s" onmouseenter="this.style.borderColor='var(--b3)'" onmouseleave="this.style.borderColor='var(--b2)'">
+              <summary style="color:var(--t1);font-weight:600;font-size:.9rem;list-style:none;display:flex;justify-content:space-between">How do I retake the Quick Tour? <span style="color:var(--a)">+</span></summary>
+              <p style="color:var(--t2);font-size:.85rem;line-height:1.7;margin-top:.7rem">Click the <strong style="color:var(--a)">Take Tour</strong> button in the top navigation bar anytime to restart the guided walkthrough of PlaceIQ's features.</p>
+            </details>
+          </div>
+        </div>
+        <div class="ibox scan" style="text-align:center;padding:2rem">
+          <div style="font-size:2rem;margin-bottom:.5rem">🤖</div>
+          <div style="font-family:'Exo 2',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:.5rem">Still have questions?</div>
+          <div style="color:var(--t2);font-size:.88rem;margin-bottom:1rem">Use the AI Assistant (bottom-right corner) — it can answer anything about PlaceIQ and beyond.</div>
+          <button class="btn btn-b" onclick="document.getElementById('chatbot-fab').click()">💬 Open AI Assistant</button>
+        </div>
+      </div>
+
+    <!-- RESUME ANALYZER TAB -->
+<div class="tab" id="tc-resume">
+    <div class="hero">
+        <div class="eyebrow">AI Resume Intelligence</div>
+        <h1>Resume <span class="gw">Analyzer</span></h1>
+        <p>Upload your resume (PDF) and get instant AI-powered analysis, skill suggestions, and improvement tips.</p>
+    </div>
+    
+    <div class="pgrid">
+        <div class="pform scan">
+            <div class="ff">
+                <label>Upload Resume (PDF)</label>
+                <input type="file" id="resumeFile" accept=".pdf" style="background:var(--inp); border:1px solid var(--b2); border-radius:9px; padding:.7rem; color:var(--t1); width:100%">
+            </div>
+            <button class="btn btn-b" style="width:100%; margin-top:1rem" onclick="analyzeResume()">
+                🔍 Analyze Resume
+            </button>
+            <div class="ff" style="margin-top:1rem">
+                <label>Or paste your resume text</label>
+                <textarea id="resumeText" rows="6" placeholder="Paste your resume content here...&#10;&#10;Example:&#10;Education: B.Tech Computer Science, CGPA: 8.5&#10;Skills: Python, Machine Learning, SQL&#10;Internship: Software Developer at XYZ Corp" style="background:var(--inp); border:1px solid var(--b2); border-radius:9px; padding:.7rem; color:var(--t1); width:100%; font-family:'Outfit',sans-serif"></textarea>
+            </div>
+        </div>
+        
+        <div class="pres" id="resumeResult">
+            <div class="empti">📄</div>
+            <div class="empts">Upload your resume or paste text<br/>to get AI-powered analysis</div>
+        </div>
+    </div>
+</div>
+<!-- DASHBOARD TAB -->
+<div class="tab" id="tc-dashboard">
+  <div class="hero">
+    <div class="eyebrow">Your Personal Dashboard</div>
+    <h1>Welcome, <span id="dashboard-user-name" class="gw">Student</span>!</h1>
+    <p>Your saved colleges, prediction history, and profile at a glance.</p>
+  </div>
+
+  <div class="tcol" style="gap:1.5rem">
+    <div>
+      <div class="ibox">
+        <div class="slbl">👤 Profile</div>
+        <div id="dashboard-profile"></div>
+      </div>
+      <div class="ibox" style="margin-top:1rem">
+        <div class="slbl">⭐ Saved Colleges</div>
+        <div id="saved-colleges-list"></div>
+      </div>
+    </div>
+    <div>
+      <div class="ibox">
+        <div class="slbl">📈 Placement Prediction History</div>
+        <div id="prediction-history-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    </main>
+  </div>
+  <footer>
+    <div class="ftbrand">PlaceIQ</div>
+    <div class="ftby">// crafted with ⚡ by <span>Ritesh Kumar Singh</span> · placement intelligence platform · 2025</div>
+    <div class="ftlinks">
+      <span class="ftlnk" onclick="goTab('home')">Colleges</span>
+      <span class="ftlnk" onclick="goTab('news')">Digest</span>
+      <span class="ftlnk" onclick="goTab('pred')">Predictor</span>
+      <span class="ftlnk" onclick="goTab('compare')">Compare</span>
+      <span class="ftlnk" onclick="goTab('help')">Help</span>
+    </div>
+  </footer>
+</div>
+<div class="toast" id="tst"></div>
+<script>
+  let COLLEGES = [];
+
+async function fetchColleges() {
+    try {
+        const response = await fetch('/api/colleges?per_page=2000');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        COLLEGES = data.colleges.map(c => ({
+            id: c.id,
+            name: c.name,
+            city: c.city || 'N/A',
+            state: c.state || 'N/A',
+            stream: c.stream,
+            fees: c.fees_per_year || 0,
+            nirf: c.nirf_rank || 999,
+            placed: c.placement_pct || 70,
+            avg: c.avg_ctc || 5,
+            high: c.highest_ctc ? c.highest_ctc : 0.5,  // ✅ FIXED
+            rec: Array.isArray(c.top_recruiters) ? c.top_recruiters : [],
+            about: c.about || `${c.name} is a leading institution in ${c.city || 'India'}.`,
+            trends: c.trends || [{y:"2023", v:c.avg_ctc || 5}]
+        }));
+        renderC(COLLEGES);
+        populateStreamsAndStates();
+    } catch (error) {
+        console.error('Failed to load colleges:', error);
+        document.getElementById('cgrid').innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem; color:red">⚠️ Could not connect to backend. Make sure server is running on port 5000.</div>';
+    }
+}
+function renderC(list) {
+    const g = document.getElementById('cgrid');
+    if (!list.length) {
+        g.innerHTML = '<p style="color:var(--t3);font-family:DM Mono,monospace;grid-column:1/-1;text-align:center;padding:3rem 0">// no results found — adjust filters</p>';
+        return;
+    }
+    g.innerHTML = list.map(c => {
+        const rec2 = (c.rec || []).concat(c.rec || []).map(r => `<span class="rpill">${r}</span>`).join('');
+        return `<div class="ccard" onclick="openDet(${c.id})">
+            <div class="cacc"></div>
+            <div class="sp sp-tl"></div><div class="sp sp-tr"></div><div class="sp sp-bl"></div><div class="sp sp-br"></div>
+            <div class="cch">
+                <div class="ccn">
+                    <span class="favorite-star" onclick="toggleFavorite(event, ${c.id})" style="cursor:pointer; margin-right:0.5rem; color:var(--gold)">${getFavorites().includes(c.id) ? '★' : '☆'}</span>
+                    ${c.name}
+                </div>
+                <div class="ccrk">#${c.nirf} NIRF</div>
+            </div>
+            <div class="ccm"><span class="tag">📍 ${c.city}</span><span class="tag">${c.stream}</span><span class="tag">₹${c.fees}L/yr</span></div>
+            <div class="mwrap"><div class="mtrack">${rec2}</div></div>
+            <div class="ccs">
+                <div class="cc-stat"><span class="ccsv">${c.placed}%</span><div class="ccsl">Placed</div></div>
+                <div class="cc-stat"><span class="ccsv">₹${formatCTC(c.avg)}</span><div class="ccsl">Avg CTC</div></div>
+                <div class="cc-stat"><span class="ccsv">₹${formatCTC(c.high)}</span><div class="ccsl">Highest</div></div>
+            </div>
+            <button class="vbtn">View Details</button>
+        </div>`;
+    }).join('');
+    document.querySelectorAll('.ccard').forEach(el => { if (typeof initTilt === 'function') initTilt(el); if (typeof hoverEl === 'function') hoverEl(el); });
+    document.querySelectorAll('.rpill,.vbtn,.tag,.ccrk').forEach(el => { if (typeof hoverEl === 'function') hoverEl(el); });
+}
+
+function populateStreamsAndStates() {
+    const streamList = document.getElementById('stream-list');
+    const stateList = document.getElementById('state-list');
+    if (!streamList || !stateList) return;
+    const streams = [...new Set(COLLEGES.map(c => c.stream))].filter(s => s);
+    streamList.innerHTML = streams.map(s => `<option value="${s}">`).join('');
+    const states = [...new Set(COLLEGES.map(c => c.state))].filter(s => s);
+    stateList.innerHTML = states.map(s => `<option value="${s}">`).join('');
+}
+
+// Helper to format CTC (crore or lakh)
+function normaliseCTC(college) {
+    // If highest is suspiciously low compared to average (e.g., < avg), assume it's in Crores
+    if (college.high < college.avg && college.avg > 10) {
+        college.high = college.high * 100;   // convert Crore → Lakh
+    }
+    return college;
+}
+// Helper to format CTC (lakhs → Cr or L)
+function formatCTC(ctc) {
+    if (ctc === null || ctc === undefined) return 'N/A';
+    if (ctc >= 100) {
+        let crores = ctc / 100;
+        return crores.toFixed(1) + 'Cr';
+    }
+    return Math.round(ctc) + 'L';
+}
+fetchColleges();
+
+
+runCounters();
+document.querySelectorAll('.nl,.lbtn,.thbtn,.ftlnk,.back,.ntag,.trc,.vsc').forEach(hoverEl);
+document.querySelectorAll('.ncard').forEach(initNewsCard);
+
+// Call this when the page loads
+document.addEventListener('DOMContentLoaded', fetchColleges);
+const ALL_SKILLS = [
+    // Technical - Programming Languages
+    "Python", "Java", "Kotlin", "Go (Golang)", "Rust", "C / C++", "C#", "JavaScript", "TypeScript", "Swift", "Ruby", "PHP", "Scala", "R", "Dart", "Elixir", "Erlang", "Haskell", "Lua", "Perl",
+    // Technical - Frameworks & Libraries
+    "React.js", "Next.js", "Vue.js", "Angular", "Svelte", "Node.js", "Express.js", "Django", "Flask", "Spring Boot", "ASP.NET Core", "Ruby on Rails", "Laravel", "Symfony", "FastAPI", "NestJS", "GraphQL", "REST API", "gRPC",
+    // Technical - Data & AI/ML
+    "Machine Learning", "Deep Learning", "LangChain / RAG", "LLM / Generative AI", "PyTorch / TensorFlow", "Scikit-learn", "Pandas", "NumPy", "Hadoop", "Spark", "Kafka", "Airflow", "dbt", "Snowflake", "BigQuery", "Data Warehouse", "ETL", "Data Visualization", "Tableau", "Power BI", "Looker",
+    // Technical - Databases
+    "SQL / PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch", "Cassandra", "DynamoDB", "Neo4j", "Oracle DB", "SQL Server",
+    // Technical - Cloud & DevOps
+    "AWS", "GCP", "Azure", "Docker", "Kubernetes", "Terraform", "Ansible", "CI/CD (GitHub Actions)", "Jenkins", "Prometheus", "Grafana", "ELK Stack", "Git / GitHub", "Linux / Bash", "Windows Server", "Shell Scripting",
+    // Technical - Mobile & Frontend
+    "Flutter", "React Native", "iOS (Swift)", "Android (Kotlin/Java)", "HTML/CSS", "Tailwind CSS", "Bootstrap", "Sass/LESS", "Webpack", "Vite",
+    // Technical - Security
+    "Cybersecurity / CEH", "Penetration Testing", "Vulnerability Assessment", "Network Security", "Identity & Access Management (IAM)", "SIEM", "ISO 27001",
+    // Technical - Embedded & Hardware
+    "VLSI / Verilog", "Embedded C", "MATLAB", "Arduino", "Raspberry Pi", "RTOS", "FPGA",
+    // Technical - Other
+    "Microservices", "Blockchain / Web3", "Solidity", "Smart Contracts", "Game Development (Unity/Unreal)", "AR/VR", "Robotics",
+    // Non-tech / Soft Skills
+    "Communication", "Teamwork", "Leadership", "Problem Solving", "Time Management", "Project Management", "Agile / Scrum", "Kanban", "Presentation Skills", "Public Speaking", "Negotiation", "Critical Thinking", "Adaptability", "Creativity", "Emotional Intelligence", "Conflict Resolution", "Mentoring", "Coaching", "Strategic Planning", "Decision Making",
+    // Non-tech / Business & Management
+    "Business Analysis", "Sales", "Marketing", "Digital Marketing", "SEO", "Content Writing", "Copywriting", "Social Media Management", "Email Marketing", "Google Analytics", "Facebook Ads", "Google Ads", "CRM (Salesforce)", "HubSpot", "Zoho", "JIRA", "Confluence", "Asana", "Trello",
+    // Non-tech / Design & Creative
+    "Graphic Design", "UI/UX Design", "Figma", "Adobe XD", "Adobe Photoshop", "Adobe Illustrator", "Adobe After Effects", "Video Editing", "Animation", "3D Modeling (Blender)", "Photography",
+    // Non-tech / Finance & Accounting
+    "Financial Analysis", "Accounting", "Tally", "SAP", "QuickBooks", "Xero", "Corporate Finance", "Investment Banking", "Portfolio Management", "Risk Management", "Compliance", "Auditing", "Taxation", "CFA", "CPA",
+    // Non-tech / HR & Operations
+    "HR Management", "Recruitment", "Employee Relations", "Payroll", "Performance Management", "Operations Management", "Supply Chain", "Logistics", "Procurement", "Inventory Management", "Quality Assurance (QA)", "Lean Six Sigma", "PMP",
+    // Non-tech / Customer & Support
+    "Customer Service", "Client Relationship Management", "Technical Support", "Help Desk", "Troubleshooting",
+    // Non-tech / Education & Research
+    "Research", "Teaching", "Curriculum Development", "Academic Writing", "Grant Writing",
+    // Non-tech / Languages
+    "Foreign Language (Spanish)", "Foreign Language (French)", "Foreign Language (German)", "Foreign Language (Japanese)", "Foreign Language (Mandarin)", "Foreign Language (Hindi)", "Translation", "Interpretation",
+    // Other
+    "Event Management", "Public Relations", "Media Relations", "Crisis Communication", "Fundraising", "Nonprofit Management"
+];
+function renderSkills(filter = "") {
+    const container = document.getElementById('skills-container');
+    if (!container) return;
+    const searchTerm = filter.toLowerCase().trim();
+    const filteredSkills = searchTerm === "" ? ALL_SKILLS : ALL_SKILLS.filter(s => s.toLowerCase().includes(searchTerm));
+    
+    container.innerHTML = filteredSkills.map(skill => `
+        <span class="chip" data-skill="${skill}" onclick="toggleSkill(this)">${skill}</span>
+    `).join('');
+    
+    // Re-apply selected state from localStorage
+    const selectedSkills = JSON.parse(localStorage.getItem('selectedSkills') || '[]');
+    document.querySelectorAll('#skills-container .chip').forEach(chip => {
+        if (selectedSkills.includes(chip.innerText)) {
+            chip.classList.add('on');
+        }
+    });
+}
+function forcePlacementAILayout() {
+    const pgrid = document.querySelector('#tc-pred .pgrid');
+    if (pgrid) {
+        pgrid.style.display = 'grid';
+        pgrid.style.gridTemplateColumns = '1fr 1fr';
+        pgrid.style.gap = '1.5rem';
+    }
+}
+// Call it on page load and whenever the tab might be re‑rendered
+forcePlacementAILayout();
+// Also call it after any dynamic updates that might affect the DOM
+window.addEventListener('resize', forcePlacementAILayout);
+function toggleSkill(chip) {
+    chip.classList.toggle('on');
+    // Save selected skills to localStorage
+    const selected = [...document.querySelectorAll('#skills-container .chip.on')].map(c => c.innerText);
+    localStorage.setItem('selectedSkills', JSON.stringify(selected));
+    if (typeof updatePrediction === 'function') updatePrediction();
+}
+
+function filterSkills() {
+    const searchInput = document.getElementById('skill-search');
+    renderSkills(searchInput.value);
+}
+const TKDATA=[
+  {l:"IIT Bombay avg CTC 2024",v:"₹24.5L",up:true},{l:"GATE CSE cutoff (IISc)",v:"65+",up:true},
+  {l:"IIM-A median CTC",v:"₹36L",up:true},{l:"IT layoffs",v:"↓ 18%",up:false},
+  {l:"AI/ML demand",v:"↑ 62% MoM",up:true},{l:"NIT Trichy placed",v:"88%",up:true},
+  {l:"Quant roles (Jane St)",v:"₹1.5Cr+",up:true},{l:"MBA placements 2025",v:"Record ↑",up:true},
+  {l:"VIT Vellore placed",v:"82%",up:true},{l:"Cloud SRE freshers",v:"₹20L+",up:true},
+];
+
+/* CANVAS */
+(function(){
+  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
+  let W,H,mx=0,my=0;
+  function rsz(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  rsz();window.addEventListener('resize',rsz);
+  window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  const pts=Array.from({length:90},()=>({x:Math.random()*2000,y:Math.random()*1200,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:Math.random()*1.4+.4}));
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const dk=document.documentElement.getAttribute('data-theme')==='dark';
+    const c1=dk?'0,255,209':'0,153,128',c2=dk?'124,58,255':'91,31,204';
+    pts.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      const dx=p.x-mx,dy=p.y-my,d=Math.sqrt(dx*dx+dy*dy),pull=Math.max(0,1-d/180);
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*(1+pull*1.4),0,Math.PI*2);
+      ctx.fillStyle=`rgba(${d<160?c2:c1},${dk?.45+pull*.5:.28+pull*.4})`;ctx.fill();
+      pts.slice(i+1).forEach(q=>{
+        const ddx=p.x-q.x,ddy=p.y-q.y,dd=Math.sqrt(ddx*ddx+ddy*ddy);
+        if(dd<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=`rgba(${c1},${dk?(1-dd/110)*.11:(1-dd/110)*.055})`;ctx.lineWidth=.5;ctx.stroke()}
+      });
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* CURSOR */
+const C=document.getElementById('cur'),CR=document.getElementById('curR'),CT=document.getElementById('curT');
+let cx=0,cy=0,rx=0,ry=0,tx=0,ty=0;
+window.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY});
+(function loop(){rx+=(cx-rx)*.18;ry+=(cy-ry)*.18;tx+=(cx-tx)*.08;ty+=(cy-ty)*.08;C.style.left=cx+'px';C.style.top=cy+'px';CR.style.left=rx+'px';CR.style.top=ry+'px';CT.style.left=tx+'px';CT.style.top=ty+'px';requestAnimationFrame(loop)})();
+function hoverEl(el){el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'))}
+
+/* TILT */
+function initTilt(el){
+  el.addEventListener('mousemove',e=>{
+    const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    el.style.transform=`perspective(900px) rotateY(${x*13}deg) rotateX(${-y*13}deg) translateZ(12px) scale(1.015)`;
+    el.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    el.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+  el.addEventListener('mouseleave',()=>el.style.transform='');
+  hoverEl(el);
+}
+function initNewsCard(el){
+  el.addEventListener('mousemove',e=>{
+    const r=el.getBoundingClientRect();
+    el.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    el.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+  hoverEl(el);
+}
+
+/* COUNTER */
+function runCounters(){
+  document.querySelectorAll('[data-cnt]').forEach(el=>{
+    const t=+el.dataset.cnt,s=el.dataset.sfx||'';
+    let n=0;const inc=t/(1400/16.67);
+    const iv=setInterval(()=>{n=Math.min(n+inc,t);el.textContent=Math.round(n)+s;if(n>=t)clearInterval(iv)},16.67);
+  });
+}
+
+/* THEME */
+function toggleTheme(){
+  const dk=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dk?'light':'dark');
+  const ico=dk?'🌙':'☀️';
+  document.querySelectorAll('.thbtn,#ltbtn').forEach(b=>{if(b)b.textContent=ico});
+}
+
+/* AUTH */
+let USER=null;
+const USERS={};
+function isValidEmail(e){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)}
+function showPg(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');runCounters()}
+async function doLogin(){
+  const e=document.getElementById('le').value.trim(),p=document.getElementById('lp').value;
+  if(!e||!p){toast('⚠ Fill all fields');return}
+  try{
+    const res=await fetch('http://127.0.0.1:5000/api/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:e,password:p})
+    });
+    const data=await res.json();
+    if(!res.ok){toast('⚠ '+data.error);return}
+    USER=data.user;
+    localStorage.setItem('access_token',data.access_token);
+    localStorage.setItem('refresh_token',data.refresh_token);
+    document.getElementById('nusr').textContent='// '+USER.name;
+    showPg('pg-app');goTab('home');
+    toast('⚡ Session initialized. Welcome, '+USER.name+'!');
+  }catch(err){toast('⚠ Server error. Try again.');}
+}
+
+async function doReg(){
+  const n=document.getElementById('rn').value.trim(),e=document.getElementById('re').value.trim(),p=document.getElementById('rp').value,s=document.getElementById('rs').value;
+  if(!n||!e||!p){toast('⚠ Complete all fields');return}
+  try{
+    const res=await fetch('http://127.0.0.1:5000/api/auth/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:n,email:e,password:p,stream:s})
+    });
+    const data=await res.json();
+    if(!res.ok){toast('⚠ '+data.error);return}
+    USER=data.user;
+    localStorage.setItem('access_token',data.access_token);
+    localStorage.setItem('refresh_token',data.refresh_token);
+    showPg('pg-login');
+    document.getElementById('le').value=e;
+    toast('✅ Profile created for '+n+'! Now sign in.');
+  }catch(err){toast('⚠ Server error. Try again.');}
+}
+
+function doLogout(){
+  USER=null;
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  showPg('pg-login');
+}
+function doLogout(){USER=null;showPg('pg-login')}
+
+/* NAV */
+function goTab(tab){
+  ['home','detail','news','pred','score','compare','help','resume','dashboard'].forEach(t=>{
+    const c = document.getElementById('tc-'+t);
+    if(c) c.classList.remove('active');
+  });
+  ['home','news','pred','score','compare','help','resume','dashboard'].forEach(t=>{
+    const l = document.getElementById('nl-'+t);
+    if(l) l.classList.remove('active');
+  });
+  
+  document.getElementById('tc-'+tab)?.classList.add('active');
+  if(tab !== 'detail'){
+    const nl = document.getElementById('nl-'+tab);
+    if(nl) nl.classList.add('active');
+  }
+  
+  if(tab === 'home'){
+    // Reset all search filters when returning to home
+    document.getElementById('sq').value = '';
+    document.getElementById('ss').value = '';
+    document.getElementById('sst').value = '';
+    document.getElementById('sf').value = '';
+    renderC(COLLEGES);
+    renderSkills(); 
+    populateStreamsAndStates();
+  }
+  if (tab === 'dashboard') {
+    updateDashboard();
+}
+  if(tab === 'compare') buildCmpSels();
+  if(tab === 'news'){
+    buildTicker();
+    document.getElementById('curdate').textContent = new Date().toLocaleDateString('en-IN', {
+      weekday:'long', year:'numeric', month:'long', day:'numeric'
+    });
+    if(tab === 'news'){
+    buildTicker();
+    loadRSSNews();  // <-- Add this line
+    document.getElementById('curdate').textContent = new Date().toLocaleDateString('en-IN', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+if (tab === 'pred') {
+    if (window.lastResumeData) {
+        autoFillFromResume(); // your existing function that uses lastResumeData
+        toast('✅ Resume data automatically applied!');
+    }
+}
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+async function loadRSSNews() {
+    const container = document.getElementById('rss-news');
+    if (!container) return;
+
+    // Show loading state
+    container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--t3)">Loading latest placement news...</div>';
+
+    try {
+        const response = await fetch('/api/digest/news');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const articles = await response.json();
+
+        if (!articles.length) {
+            container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--t3)">No news available at the moment. Check back later!</div>';
+            return;
+        }
+
+        container.innerHTML = articles.map(article => `
+            <div class="ncard">
+                <div class="nccat">📰 Latest</div>
+                <div class="ncn">${escapeHtml(article.title)}</div>
+                <div class="ncp">${escapeHtml(article.summary)}</div>
+                <div class="ncft">
+                    <span class="ncts">${formatDate(article.published)}</span>
+                    <a href="${article.link}" target="_blank" class="ncrd">Read more →</a>
+                </div>
+            </div>
+        `).join('');
+
+        // Re-initialize hover effects for new cards
+        document.querySelectorAll('.ncard').forEach(initNewsCard);
+    } catch (error) {
+        console.error('Error loading RSS news:', error);
+        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--a3)">⚠️ Could not load news. Please try again later.</div>';
+    }
+}
+
+// Helper: escape HTML to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Helper: format date string
+function formatDate(dateString) {
+    if (!dateString) return 'Just now';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch(e) {
+        return 'Recent';
+    }
+}
+/* TICKER */
+function buildTicker(){
+  const t=document.getElementById('tktrack');
+  const items=[...TKDATA,...TKDATA].map(d=>`<span class="tki">${d.l} <span class="${d.up?'tkup':'tkdn'}">${d.v}</span></span>`).join('');
+  t.innerHTML=items;
+}
+
+// Fixes case where highest CTC is in Crores but average is in Lakhs
+function normaliseCTC(college) {
+    if (college.high < college.avg && college.avg > 10) {
+        college.high = college.high * 100;   // Convert Cr → Lakhs
+    }
+    return college;
+}
+
+function filterC(){
+  const q = document.getElementById('sq').value.toLowerCase();
+  const s = document.getElementById('ss').value.toLowerCase();   // convert to lower
+  const st = document.getElementById('sst').value.toLowerCase(); // convert to lower
+  const f = document.getElementById('sf').value;
+  
+  renderC(COLLEGES.filter(c => {
+    // Name / city search (partial, case-insensitive)
+    if(q && !c.name.toLowerCase().includes(q) && !c.city.toLowerCase().includes(q)) return false;
+    
+    // Stream search (partial, case-insensitive)
+    if(s && !c.stream.toLowerCase().includes(s)) return false;
+    
+    // State search (partial, case-insensitive)
+    if(st && !c.state.toLowerCase().includes(st)) return false;
+    
+    // Fees filter (unchanged)
+    if(f === 'low' && c.fees >= 5) return false;
+    if(f === 'mid' && (c.fees < 5 || c.fees > 12)) return false;
+    if(f === 'high' && c.fees <= 12) return false;
+    
+    return true;
+  }));
+}
+function populateStreamsAndStates() {
+    // Get unique streams
+    const streams = [...new Set(COLLEGES.map(c => c.stream))].filter(s => s);
+    const streamList = document.getElementById('stream-list');
+    streamList.innerHTML = streams.map(s => `<option value="${s}">`).join('');
+    
+    // Get unique states
+    const states = [...new Set(COLLEGES.map(c => c.state))].filter(s => s);
+    const stateList = document.getElementById('state-list');
+    stateList.innerHTML = states.map(s => `<option value="${s}">`).join('');
+}
+
+/* DETAIL */
+async function openDet(id){
+    const c = COLLEGES.find(x => x.id === id);
+    if (!c) { toast('College not found'); return; }
+    // Normalize CTC (if highest is in Crores but avg in Lakhs)
+    let college = { ...c };
+    if (college.high < college.avg && college.avg > 10) college.high = college.high * 100;
+
+    const mx = Math.max(...college.trends.map(t => t.v));
+    const years = college.trends.map(t => t.y);
+    const ctcs = college.trends.map(t => t.v);
+    const chartId = `chart-${college.id}-${Date.now()}`;
+
+    // Build detail HTML
+    document.getElementById('detbody').innerHTML = `
+        <div class="dhero">
+            <div class="dn">${college.name}</div>
+            <div class="dm">
+                <span class="tag">📍 ${college.city}, ${college.state}</span>
+                <span class="tag">📚 ${college.stream}</span>
+                <span class="tag">₹${college.fees}L/yr</span>
+                <span class="nirfb">#${college.nirf} NIRF</span>
+            </div>
+            <div class="dsts">
+                <div class="dsb"><div class="dsv">${college.placed}%</div><div class="dsl">Placement rate</div></div>
+                <div class="dsb"><div class="dsv">₹${college.avg}L</div><div class="dsl">Avg CTC 2023</div></div>
+                <div class="dsb"><div class="dsv" style="color:var(--gold)">${formatCTC(college.high)}</div><div class="dsl">Highest offer</div></div>
+                <div class="dsb"><div class="dsv" style="color:var(--a2)">${college.rec.length}+</div><div class="dsl">Top recruiters</div></div>
+            </div>
+        </div>
+        <div class="tcol">
+            <div class="ibox scan" style="padding:1rem">
+                <div class="slbl">📈 CTC Growth Trend (Year-wise)</div>
+                <canvas id="${chartId}" style="width:100%; max-height:280px; margin-top:0.5rem"></canvas>
+                <div style="margin-top:0.8rem; font-size:0.7rem; color:var(--t3); text-align:center">
+                    📊 Average CTC in LPA • ${years[0]} to ${years[years.length-1]}
+                </div>
+            </div>
+            <div class="ibox">
+                <div class="slbl">🎭 Student Sentiment</div>
+                <div style="text-align:center; padding:1rem; color:var(--t3)">
+                    <div class="orb" style="width:50px; height:50px; font-size:1.5rem; margin-bottom:0.5rem">⏳</div>
+                    Loading sentiment data...
+                </div>
+            </div>
+        </div>
+        <div class="tcol" style="margin-top:1.2rem">
+            <div class="ibox"><div class="slbl">🏢 Top Recruiters</div><div class="rcl">${college.rec.map(r=>`<span class="rch">${r}</span>`).join('')}</div></div>
+            <div class="ibox"><div class="slbl">📖 About</div><p style="color:var(--t2);font-size:.9rem;line-height:1.75">${college.about}</p></div>
+        </div>
+    `;
+
+    goTab('detail');
+
+    // Create chart
+    setTimeout(() => {
+        const ctx = document.getElementById(chartId)?.getContext('2d');
+        if (ctx) {
+            if (window.currentChart) window.currentChart.destroy();
+            window.currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Average CTC (LPA)',
+                        data: ctcs,
+                        borderColor: 'rgba(0, 255, 209, 1)',
+                        backgroundColor: 'rgba(0, 255, 209, 0.15)',
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointBackgroundColor: 'rgba(0, 255, 209, 1)',
+                        pointBorderColor: '#020810',
+                        pointBorderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { labels: { color: 'var(--t2)', font: { size: 11, family: "'DM Mono', monospace" } }, position: 'top' },
+                        tooltip: {
+                            backgroundColor: 'var(--surf2)', titleColor: 'var(--a)', bodyColor: 'var(--t1)',
+                            borderColor: 'var(--a)', borderWidth: 1,
+                            callbacks: { label: (ctx) => `₹${ctx.raw} LPA` }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 255, 209, 0.1)' },
+                            title: { display: true, text: 'CTC (LPA)', color: 'var(--t3)', font: { size: 10 } },
+                            ticks: { color: 'var(--t2)', callback: (v) => '₹' + v + 'L' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: { display: true, text: 'Year', color: 'var(--t3)', font: { size: 10 } },
+                            ticks: { color: 'var(--t2)' }
+                        }
+                    },
+                    interaction: { intersect: false, mode: 'index' },
+                    elements: { line: { tension: 0.4 } }
+                }
+            });
+            setTimeout(() => window.currentChart?.update(), 100);
+        }
+    }, 100);
+
+    // Fetch sentiment data
+    try {
+        const sentimentRes = await fetch(`http://127.0.0.1:5000/api/sentiment/${encodeURIComponent(college.name)}`);
+        if (!sentimentRes.ok) throw new Error(`HTTP ${sentimentRes.status}`);
+        const sentiment = await sentimentRes.json();
+        const allBoxes = document.querySelectorAll('#detbody .tcol .ibox');
+        const sentimentBox = allBoxes[1];
+        if (sentimentBox) {
+            sentimentBox.innerHTML = `
+                <div class="slbl">🎭 Student Sentiment Analysis</div>
+                <div style="text-align:center; margin-bottom:1rem">
+                    <div class="sbig" style="font-size:2rem; color:${sentiment.sentiment_score > 70 ? 'var(--a)' : sentiment.sentiment_score > 40 ? 'var(--gold)' : 'var(--a3)'}">
+                        ${sentiment.sentiment_score}/100
+                    </div>
+                    <div class="sbadge" style="background:rgba(var(--ar),0.1)">${sentiment.vibe || 'Neutral'}</div>
+                </div>
+                <div class="ri"><strong style="color:var(--a)">✅ What Students Love:</strong><br/><ul style="margin-top:0.5rem; margin-left:1rem">${sentiment.positive_points?.map(p => `<li style="margin-bottom:0.3rem; color:var(--t2)">${p}</li>`).join('') || '<li>No positive points</li>'}</ul></div>
+                <div class="ri"><strong style="color:var(--a3)">⚠️ Areas for Improvement:</strong><br/><ul style="margin-top:0.5rem; margin-left:1rem">${sentiment.negative_points?.map(p => `<li style="margin-bottom:0.3rem; color:var(--t2)">${p}</li>`).join('') || '<li>No negative points</li>'}</ul></div>
+                <div class="ri"><div style="display:flex; justify-content:space-between"><span><strong>Placement Sentiment:</strong></span><span style="color:${sentiment.placement_sentiment === 'Positive' ? 'var(--a)' : 'var(--gold)'}">${sentiment.placement_sentiment || 'Neutral'}</span></div><div style="display:flex; justify-content:space-between"><span><strong>Would Recommend:</strong></span><span style="color:var(--a)">${sentiment.recommend_pct || 75}%</span></div></div>
+                <div class="ri"><em style="color:var(--t2); font-size:0.85rem">"${sentiment.summary || 'Based on student reviews, this college offers a balanced experience.'}"</em></div>
+                <div style="margin-top:1rem; font-size:0.7rem; color:var(--t3); text-align:center">Based on ${sentiment.reviews_analyzed || 10} student reviews</div>
+            `;
+        }
+    } catch (error) {
+        console.error('Sentiment error:', error);
+        const sentimentBox = document.querySelectorAll('#detbody .tcol .ibox')[1];
+        if (sentimentBox) sentimentBox.innerHTML = `<div class="slbl">🎭 Student Sentiment</div><div style="text-align:center; padding:1rem; color:var(--t3)">⚠️ Could not load sentiment data<br/><small>${error.message}</small></div>`;
+    }
+}
+
+/* CHIPS */
+function tog(el) {
+    el.classList.toggle('on');
+    hoverEl(el);
+    if (typeof updatePrediction === 'function') updatePrediction();
+}
+
+/* PLACEMENT PREDICTOR */
+function predictP(){
+  const cgpa=parseFloat(document.getElementById('pcgpa').value)||7;
+  const tier=parseInt(document.getElementById('ptier').value);
+  const bl=parseInt(document.getElementById('pbl').value);
+  const intern=parseInt(document.getElementById('pin').value);
+  const branch=document.getElementById('pb').value;
+  const skills=document.querySelectorAll('#schips .chip.on').length;
+  let base=cgpa*1.8;
+  if(tier===1)base*=1.8;else if(tier===2)base*=1.3;
+  base-=bl*1.5;base+=intern*2+skills*.9;
+  if(branch.includes('Computer')||branch.includes('Data'))base*=1.25;
+  if(branch.includes('Cyber'))base*=1.15;
+  if(branch.includes('MBA'))base*=1.35;
+  base=Math.max(4,Math.min(50,base));
+  const lo=(base*.82).toFixed(1),hi=(base*1.22).toFixed(1);
+  let prob=60+cgpa*3-bl*8+intern*6+skills*.8;
+  if(tier===1)prob+=20;else if(tier===2)prob+=10;
+  prob=Math.max(20,Math.min(99,Math.round(prob)));
+  const el=document.getElementById('pres');
+  // Store prediction history
+let history = JSON.parse(localStorage.getItem('predictionHistory') || '[]');
+history.unshift({
+    date: new Date().toISOString(),
+    ctc_range: { low: lo, high: hi },
+    probability: prob
+});
+history = history.slice(0, 10);
+localStorage.setItem('predictionHistory', JSON.stringify(history));
+  el.innerHTML=`<div class="orb">💼</div><div class="reb">Expected CTC Range</div><div class="rctc">₹${lo}L – ₹${hi}L</div><div class="rrange">per annum · 2024 estimates · ${skills} skills selected</div><div class="pbw"><div class="pbh"><span class="pbl">Placement probability</span><span class="pbp">${prob}%</span></div><div class="ptrack"><div class="pfill" id="pfill"></div></div></div><div class="rnote">// model: CGPA × tier × skills × internship signals</div>`;
+  setTimeout(()=>{const f=document.getElementById('pfill');if(f)f.style.width=prob+'%'},100);
+}
+
+/* SCORE PREDICTOR */
+function predictS(){
+  const mock=parseFloat(document.getElementById('smock').value)||55;
+  const months=parseFloat(document.getElementById('smon').value)||4;
+  const tests=parseInt(document.getElementById('stests').value);
+  const coach=parseFloat(document.getElementById('scoach').value);
+  const strong=document.querySelectorAll('#subchips .chip.on').length;
+  const exam=document.getElementById('se').value;
+  let score=mock*.55+months*1.8+tests*3+strong*2+coach*5;
+  score=Math.max(25,Math.min(98,Math.round(score)));
+  const lo=Math.max(20,score-8),hi=Math.min(100,score+7);
+  let rank='';
+  if(exam.includes('GATE')){if(score>=80)rank='🏆 Rank ~100–500 · IIT / IISc eligible';else if(score>=65)rank='✅ Rank ~500–3000 · NIT / IIIT eligible';else rank='📌 Rank ~3000–10000 · State college eligible'}
+  else if(exam==='CAT'){if(score>=90)rank='🏆 Percentile 98+ · IIM A/B/C eligible';else if(score>=75)rank='✅ Percentile 90–98 · IIM C–L eligible';else rank='📌 Percentile 75–90 · MDI / SPJIMR eligible'}
+  else rank='📌 Good standing for CUET PG top colleges';
+  const el=document.getElementById('sres');
+  el.innerHTML=`<div class="orb" style="border-color:rgba(var(--a3r),.4);background:radial-gradient(circle,rgba(var(--a3r),.1),transparent);animation:porb 2.5s ease-in-out infinite">🎯</div><div class="reb">Predicted score · ${exam}</div><div class="sbig">${score}</div><div class="sbadge">Range: ${lo} – ${hi} / 100</div><div class="pbw"><div class="ptrack" style="margin-bottom:.75rem"><div class="pfill" id="sfill" style="background:linear-gradient(90deg,var(--a3),var(--gold))"></div></div></div><div class="ri">${rank}</div><div class="rnote" style="margin-top:.75rem">// based on mock avg · prep duration · subject mastery signals</div>`;
+  setTimeout(()=>{const f=document.getElementById('sfill');if(f)f.style.width=score+'%'},100);
+}
+
+/* COMPARE */
+/* COMPARE */
+function buildCmpSels() {
+    const opts = COLLEGES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    // Create a single datalist for all four inputs
+    const datalistId = 'college-list';
+    let datalist = document.getElementById(datalistId);
+    if (!datalist) {
+        datalist = document.createElement('datalist');
+        datalist.id = datalistId;
+        document.body.appendChild(datalist);
+    }
+    datalist.innerHTML = opts;
+
+    const container = document.getElementById('cmpsels');
+    container.innerHTML = '';
+    for (let i = 0; i < 4; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `cs${i}`;
+        input.placeholder = `Search & select college ${i+1}...`;
+        input.classList.add('csel');
+        input.setAttribute('list', datalistId);
+        input.autocomplete = 'off';
+        input.oninput = function() { buildCmpTable(); };
+        container.appendChild(input);
+    }
+    buildCmpTable();
+}
+function buildCmpTable() {
+    const sel = [];
+    for (let i = 0; i < 4; i++) {
+        const input = document.getElementById(`cs${i}`);
+        const val = input ? input.value.trim() : '';
+        if (val) {
+            // Match by name (case-insensitive)
+            const college = COLLEGES.find(c => c.name.toLowerCase() === val.toLowerCase());
+            if (college) sel.push(college);
+            else {
+                // Try to match by id if numeric (optional)
+                const id = parseInt(val);
+                if (!isNaN(id)) {
+                    const collegeById = COLLEGES.find(c => c.id === id);
+                    if (collegeById) sel.push(collegeById);
+                }
+            }
+        }
+    }
+    const w = document.getElementById('cmptable');
+    if (!sel.length) {
+        w.innerHTML = '<p style="color:var(--t3);font-family:DM Mono,monospace;text-align:center;padding:3rem 0">// select colleges above to begin comparison</p>';
+        return;
+    }
+    const mP = Math.max(...sel.map(c => c.placed));
+    const mC = Math.max(...sel.map(c => c.avg));
+    const mF = Math.min(...sel.map(c => c.fees));
+    w.innerHTML = `<table class="cmpt"><thead><tr><th>Metric</th>${sel.map(c => `<th>${c.name}</th>`).join('')}</tr></thead><tbody>
+        <tr><td>State</td>${sel.map(c => `<td>${c.state}</td>`).join('')}</tr>
+        <tr><td>NIRF Rank</td>${sel.map(c => `<td><span class="nirfb">#${c.nirf}</span></td>`).join('')}</tr>
+        <tr><td>Stream</td>${sel.map(c => `<td>${c.stream}</td>`).join('')}</tr>
+        <tr><td>Annual Fees</td>${sel.map(c => `<td class="${c.fees === mF ? 'cb' : ''}"><span class="cv">₹${c.fees}L</span></td>`).join('')}</tr>
+        <tr><td>Placement %</td>${sel.map(c => `<td class="${c.placed === mP ? 'cb' : ''}"><span class="cv">${c.placed}%</span></td>`).join('')}</tr>
+        <tr><td>Avg CTC 2023</td>${sel.map(c => `<td class="${c.avg === mC ? 'cb' : ''}"><span class="cv">₹${c.avg}L</span></td>`).join('')}</tr>
+        <tr><td>Highest Offer</td>${sel.map(c => `<td><span class="cv">₹${c.high}Cr</span></td>`).join('')}</tr>
+        <tr><td>Top Recruiters</td>${sel.map(c => `<td style="font-size:.8rem;color:var(--t2);font-family:DM Mono,monospace">${c.rec.slice(0,3).join(' · ')}</td>`).join('')}</tr>
+    </tbody></table>
+    <p style="margin-top:.75rem;font-size:.74rem;color:var(--t3);font-family:DM Mono,monospace">// green highlight = best metric among selected colleges</p>`;
+}
+
+/* TOAST */
+function toast(msg){const t=document.getElementById('tst');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500)}
+
+/* INIT */
+runCounters();
+document.querySelectorAll('.nl,.lbtn,.thbtn,.ftlnk,.back,.ntag,.trc,.vsc').forEach(hoverEl);
+document.querySelectorAll('.ncard').forEach(initNewsCard);
+// Login: Enter key submission
+const loginEmail = document.getElementById('le');
+const loginPass = document.getElementById('lp');
+function handleLoginEnter(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        doLogin();
+    }
+}
+if (loginEmail) loginEmail.addEventListener('keypress', handleLoginEnter);
+if (loginPass) loginPass.addEventListener('keypress', handleLoginEnter);
+
+// Register: Enter key submission
+const regName = document.getElementById('rn');
+const regEmail = document.getElementById('re');
+const regPass = document.getElementById('rp');
+const regStream = document.getElementById('rs');
+function handleRegEnter(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        doReg();
+    }
+}
+if (regName) regName.addEventListener('keypress', handleRegEnter);
+if (regEmail) regEmail.addEventListener('keypress', handleRegEnter);
+if (regPass) regPass.addEventListener('keypress', handleRegEnter);
+if (regStream) regStream.addEventListener('keypress', handleRegEnter);
+
+// Gauge drawing
+function drawGauge(percentage) {
+    const canvas = document.getElementById('placement-gauge');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    
+    // Background arc (gray)
+    ctx.beginPath();
+    ctx.arc(w/2, h, w/2, Math.PI, 0, false);
+    ctx.strokeStyle = 'rgba(var(--t3),0.3)';
+    ctx.lineWidth = 12;
+    ctx.stroke();
+    
+    // Foreground arc (colored)
+    const angle = Math.PI + (percentage / 100) * Math.PI;
+    ctx.beginPath();
+    ctx.arc(w/2, h, w/2, Math.PI, angle, false);
+    ctx.strokeStyle = percentage > 70 ? 'var(--a)' : (percentage > 40 ? 'var(--gold)' : 'var(--a3)');
+    ctx.lineWidth = 12;
+    ctx.stroke();
+    
+    // Center text
+    ctx.font = 'bold 20px "Exo 2"';
+    ctx.fillStyle = 'var(--t1)';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${percentage}%`, w/2, h-10);
+}
+
+// Live prediction update
+function updatePrediction() {
+    const cgpa = parseFloat(document.getElementById('pcgpa').value);
+    const tier = parseInt(document.getElementById('ptier').value);
+    const bl = parseInt(document.getElementById('pbl').value);
+    const intern = parseInt(document.getElementById('pin').value);
+    const branch = document.getElementById('pb').value;
+    const skills = document.querySelectorAll('#skills-container .chip.on').length;   
+
+    // Update display values
+    document.getElementById('cgpa-value').innerText = cgpa.toFixed(1);
+    document.getElementById('tier-value').innerText = tier === 1 ? 'Tier 1' : (tier === 2 ? 'Tier 2' : 'Tier 3');
+    document.getElementById('intern-value').innerText = intern;
+    document.getElementById('skill-count').innerText = skills + ' skills selected';
+
+    // --- Prediction logic (same as your original) ---
+    let base = cgpa * 1.8;
+    if (tier === 1) base *= 1.8;
+    else if (tier === 2) base *= 1.3;
+    base -= bl * 1.5;
+    base += intern * 2 + skills * 0.9;
+    if (branch.includes('Computer') || branch.includes('Data')) base *= 1.25;
+    if (branch.includes('Cyber')) base *= 1.15;
+    if (branch.includes('MBA')) base *= 1.35;
+    base = Math.max(4, Math.min(50, base));
+    const lo = (base * 0.82).toFixed(1);
+    const hi = (base * 1.22).toFixed(1);
+    const mid = (parseFloat(lo) + parseFloat(hi)) / 2;
+
+    let prob = 60 + cgpa * 3 - bl * 8 + intern * 6 + skills * 0.8;
+    if (tier === 1) prob += 20;
+    else if (tier === 2) prob += 10;
+    prob = Math.max(20, Math.min(99, Math.round(prob)));
+
+    // Update UI
+    document.getElementById('ctc-range').innerHTML = `₹${lo}L – ₹${hi}L`;
+    document.getElementById('prob-value').innerText = prob + '%';
+    const fill = document.getElementById('pfill');
+    if (fill) fill.style.width = prob + '%';
+    drawGauge(prob);
+
+    // Historical comparison (using global COLLEGES array)
+    const tierColleges = COLLEGES.filter(c => c.tier === tier);
+    const avgTierCTC = tierColleges.length ? (tierColleges.reduce((s,c) => s + c.avg, 0) / tierColleges.length).toFixed(1) : null;
+    const compareDiv = document.getElementById('historical-compare');
+    if (avgTierCTC) {
+        const diff = (mid - parseFloat(avgTierCTC)).toFixed(1);
+        compareDiv.style.display = 'block';
+        compareDiv.innerHTML = `<strong style="color:var(--a)">📊 Historical Comparison:</strong><br/>
+            Average CTC for Tier-${tier} colleges: ₹${avgTierCTC}L<br/>
+            Your predicted CTC is ${diff >= 0 ? `₹${diff}L above` : `₹${Math.abs(diff)}L below`} the tier average.`;
+    } else {
+        compareDiv.style.display = 'none';
+    }
+
+    // Actionable tips
+    const tips = [];
+    if (cgpa < 7.0) tips.push("Improving CGPA above 7.0 significantly opens Tier-1 recruiter shortlists.");
+    if (intern === 0) tips.push("Even 1 relevant internship can boost your CTC range by ~8%.");
+    if (skills < 3) tips.push("Add 2–3 in-demand skills (Python, DSA, Cloud) to raise your offer ceiling.");
+    const hasAISkill = [...document.querySelectorAll('#schips .chip.on')].some(chip => chip.innerText.toLowerCase().includes('ml') || chip.innerText.toLowerCase().includes('ai'));
+    if (!hasAISkill && !branch.toLowerCase().includes('ai')) {
+        tips.push("AI/ML skills command the highest premiums in the current market (+28–32%).");
+    }
+    const tipsDiv = document.getElementById('actionable-tips');
+    if (tips.length) {
+        tipsDiv.style.display = 'block';
+        tipsDiv.innerHTML = `<strong style="color:var(--a2)">💡 Actionable Tips:</strong><br/><ul style="margin-top:0.5rem; margin-left:1rem">${tips.map(t => `<li style="margin-bottom:0.3rem">${t}</li>`).join('')}</ul>`;
+    } else {
+        tipsDiv.style.display = 'none';
+    }
+    // Gather selected skills array for suggestions
+      const selectedSkillsArray = [...document.querySelectorAll('#skills-container .chip.on')].map(c => c.innerText);
+      generatePersonalizedSuggestions(cgpa, tier, selectedSkillsArray.length, branch, prob, selectedSkillsArray);
+    // Fetch college recommendations
+    fetchCollegeRecommendations(mid, branch.includes('MBA') ? 'MBA' : 'Engineering');
+}
+// Also, make sure the function populateStreamsAndStates exists (if you added it).
+function populateStreamsAndStates() {
+    const streamList = document.getElementById('stream-list');
+    const stateList = document.getElementById('state-list');
+    if (!streamList || !stateList) return;
+    const streams = [...new Set(COLLEGES.map(c => c.stream))].filter(s => s);
+    streamList.innerHTML = streams.map(s => `<option value="${s}">`).join('');
+    const states = [...new Set(COLLEGES.map(c => c.state))].filter(s => s);
+    stateList.innerHTML = states.map(s => `<option value="${s}">`).join('');
+}
+// Auto-fill from Resume (requires lastResumeData from resume analysis)
+async function autoFillFromResume() {
+    if (!window.lastResumeData) {
+        toast('⚠️ No resume data found. Please analyze a resume in the Resume AI tab first.');
+        return;
+    }
+    const data = window.lastResumeData;
+    if (data.cgpa) document.getElementById('pcgpa').value = data.cgpa;
+    if (data.experience_years > 0) document.getElementById('pin').value = Math.min(data.experience_years, 3);
+    // Map skills: toggle chips that match resume's skills_found
+    const skillChips = document.querySelectorAll('#schips .chip');
+    skillChips.forEach(chip => {
+        const skill = chip.innerText.toLowerCase();
+        if (data.skills_found.some(s => skill.includes(s.toLowerCase()))) {
+            chip.classList.add('on');
+        } else {
+            chip.classList.remove('on');
+        }
+    });
+    updatePrediction();
+    toast('✅ Resume data applied!');
+}
+
+// Override the original predictP to just call updatePrediction (optional)
+function predictP() {
+    updatePrediction();
+    toast('Prediction updated!');
+}
+async function analyzeResumeForPlacement() {
+    const fileInput = document.getElementById('placement-resume-file');
+    const textInput = document.getElementById('placement-resume-text');
+    
+    if (!fileInput.files.length && !textInput.value.trim()) {
+        toast('Please upload a PDF or paste resume text.');
+        return;
+    }
+
+    let formData = new FormData();
+    if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+    } else {
+        formData.append('text', textInput.value);
+    }
+
+    toast('🔍 Analyzing resume...');
+
+    try {
+        const response = await fetch('/api/ml/resume', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Analysis failed');
+
+        // Store for later use (e.g., "Auto-fill from Resume" button)
+        window.lastResumeData = data;
+
+        // Auto-fill CGPA and internships
+        if (data.cgpa) document.getElementById('pcgpa').value = data.cgpa;
+        if (data.experience_years > 0) document.getElementById('pin').value = Math.min(data.experience_years, 3);
+
+        // Toggle skills chips that match the resume
+        const skillChips = document.querySelectorAll('#skills-container .chip');
+        skillChips.forEach(chip => {
+            const skill = chip.innerText.toLowerCase();
+            if (data.skills_found.some(s => skill.includes(s.toLowerCase()))) {
+                chip.classList.add('on');
+            } else {
+                chip.classList.remove('on');
+            }
+        });
+
+        // Save selected skills to localStorage (for persistence)
+        const selected = [...document.querySelectorAll('#skills-container .chip.on')].map(c => c.innerText);
+        localStorage.setItem('selectedSkills', JSON.stringify(selected));
+
+        // Update prediction (sliders, gauge, recommendations)
+        updatePrediction();
+        toast('✅ Resume applied! Prediction updated.');
+    } catch (err) {
+        console.error(err);
+        toast('❌ Error analyzing resume: ' + err.message);
+    }
+}
+// ========== PHASE 1: FAVORITES & DASHBOARD ==========
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favoriteColleges') || '[]');
+}
+function saveFavorites(favs) {
+    localStorage.setItem('favoriteColleges', JSON.stringify(favs));
+}
+function toggleFavorite(event, id) {
+    event.stopPropagation();
+    let favs = getFavorites();
+    if (favs.includes(id)) {
+        favs = favs.filter(f => f !== id);
+    } else {
+        favs.push(id);
+    }
+    saveFavorites(favs);
+    renderC(COLLEGES);
+    if (document.getElementById('tc-dashboard') && document.getElementById('tc-dashboard').classList.contains('active')) updateDashboard();
+}
+function goToCollege(id) {
+    goTab('detail');
+    openDet(id);
+}
+function updateDashboard() {
+    const profileDiv = document.getElementById('dashboard-profile');
+    if (USER) {
+        profileDiv.innerHTML = `
+            <p><strong>Name:</strong> ${USER.name}</p>
+            <p><strong>Email:</strong> ${USER.email}</p>
+            <p><strong>Stream:</strong> ${USER.stream || 'Not set'}</p>
+            <p><strong>Member since:</strong> ${new Date(USER.created_at).toLocaleDateString()}</p>
+        `;
+        document.getElementById('dashboard-user-name').innerText = USER.name.split(' ')[0];
+    } else {
+        profileDiv.innerHTML = '<p>Please log in to see your profile.</p>';
+        document.getElementById('dashboard-user-name').innerText = 'Student';
+    }
+
+    const favIds = getFavorites();
+    const savedDiv = document.getElementById('saved-colleges-list');
+    if (favIds.length === 0) {
+        savedDiv.innerHTML = '<p>No saved colleges yet. Click the ★ on any college card to save it.</p>';
+    } else {
+        const saved = favIds.map(id => COLLEGES.find(c => c.id == id)).filter(c => c);
+        savedDiv.innerHTML = saved.map(c => `
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--b2); display:flex; justify-content:space-between">
+                <span><strong>${c.name}</strong> (${c.stream})</span>
+                <button class="vbtn" style="padding:0.2rem 0.5rem" onclick="goToCollege(${c.id})">View</button>
+            </div>
+        `).join('');
+    }
+
+    const history = JSON.parse(localStorage.getItem('predictionHistory') || '[]');
+    const histDiv = document.getElementById('prediction-history-list');
+    if (history.length === 0) {
+        histDiv.innerHTML = '<p>No predictions yet. Go to Placement AI tab and make a prediction.</p>';
+    } else {
+        histDiv.innerHTML = history.map(h => `
+            <div style="padding:0.5rem 0; border-bottom:1px solid var(--b2)">
+                <div><strong>Date:</strong> ${new Date(h.date).toLocaleString()}</div>
+                <div><strong>CTC Range:</strong> ₹${h.ctc_range.low}L – ₹${h.ctc_range.high}L</div>
+                <div><strong>Probability:</strong> ${h.probability}%</div>
+            </div>
+        `).join('');
+    }
+}
+console.log("openDet defined?", typeof openDet);
+console.log("COLLEGES length:", COLLEGES.length);
+// Favorites helpers
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favoriteColleges') || '[]');
+}
+function saveFavorites(favs) {
+    localStorage.setItem('favoriteColleges', JSON.stringify(favs));
+}
+function toggleFavorite(event, id) {
+    event.stopPropagation();
+    let favs = getFavorites();
+    if (favs.includes(id)) {
+        favs = favs.filter(f => f !== id);
+    } else {
+        favs.push(id);
+    }
+    saveFavorites(favs);
+    renderC(COLLEGES);  // re-render to update star
+    if (document.getElementById('tc-dashboard') && document.getElementById('tc-dashboard').classList.contains('active')) updateDashboard();
+}
+
+// CTC formatter
+function formatCTC(ctc) {
+    if (ctc === null || ctc === undefined) return 'N/A';
+    if (ctc >= 100) {
+        let crores = ctc / 100;
+        return crores.toFixed(1) + 'Cr';
+    }
+    return Math.round(ctc) + 'L';
+}
+// ========== FAVORITES & DASHBOARD ==========
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favoriteColleges') || '[]');
+}
+function saveFavorites(favs) {
+    localStorage.setItem('favoriteColleges', JSON.stringify(favs));
+}
+function toggleFavorite(event, id) {
+    event.stopPropagation();
+    let favs = getFavorites();
+    if (favs.includes(id)) {
+        favs = favs.filter(f => f !== id);
+    } else {
+        favs.push(id);
+    }
+    saveFavorites(favs);
+    renderC(COLLEGES); // re‑render to update star
+    if (document.getElementById('tc-dashboard') && document.getElementById('tc-dashboard').classList.contains('active')) updateDashboard();
+}
+
+// ========== CTC FORMATTER ==========
+function formatCTC(ctc) {
+    if (ctc === null || ctc === undefined) return 'N/A';
+    if (ctc >= 100) {
+        let crores = ctc / 100;
+        return crores.toFixed(1) + 'Cr';
+    }
+    return Math.round(ctc) + 'L';
+}
+// ========== FIX MISSING FUNCTIONS ==========
+async function fetchCollegeRecommendations(targetCtc, stream) {
+    // Temporary dummy function to avoid errors
+    console.log("Fetch recommendations for", targetCtc, stream);
+    const recDiv = document.getElementById('college-recommendations');
+    if (recDiv) recDiv.style.display = 'none';
+}
+
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favoriteColleges') || '[]');
+}
+
+function saveFavorites(favs) {
+    localStorage.setItem('favoriteColleges', JSON.stringify(favs));
+}
+
+function toggleFavorite(event, id) {
+    event.stopPropagation();
+    let favs = getFavorites();
+    if (favs.includes(id)) {
+        favs = favs.filter(f => f !== id);
+    } else {
+        favs.push(id);
+    }
+    saveFavorites(favs);
+    if (typeof renderC === 'function') renderC(COLLEGES);
+    if (document.getElementById('tc-dashboard') && document.getElementById('tc-dashboard').classList.contains('active')) {
+        if (typeof updateDashboard === 'function') updateDashboard();
+    }
+}
+
+function formatCTC(ctc) {
+    if (ctc === null || ctc === undefined) return 'N/A';
+    if (ctc >= 100) {
+        let crores = ctc / 100;
+        return crores.toFixed(1) + 'Cr';
+    }
+    return Math.round(ctc) + 'L';
+}
+</script>
+<!-- WATERMARK -->
+<div style="position:fixed;bottom:18px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:.62rem;color:rgba(var(--ar),0.18);pointer-events:none;z-index:9990;white-space:nowrap;letter-spacing:.12em;user-select:none">© PlaceIQ · by Ritesh Kumar Singh · GLBITM</div>
+
+<!-- QUICK TOUR OVERLAY -->
+<div id="tour-overlay" style="display:none;position:fixed;inset:0;z-index:10000;pointer-events:none">
+  <div id="tour-highlight" style="position:absolute;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.72),0 0 0 3px var(--a);transition:all .45s cubic-bezier(.23,1,.32,1);pointer-events:none"></div>
+  <div id="tour-tip" style="position:absolute;background:var(--surf2);border:1px solid var(--b3);border-radius:16px;padding:1.3rem 1.6rem;max-width:320px;box-shadow:0 0 40px rgba(var(--ar),.3);pointer-events:all;z-index:10001">
+    <div style="position:absolute;top:-1px;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--a),transparent)"></div>
+    <div id="tour-step-lbl" style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--a);letter-spacing:.1em;margin-bottom:.5rem">STEP 1 / 6</div>
+    <div id="tour-title" style="font-family:'Exo 2',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:.5rem"></div>
+    <div id="tour-body" style="color:var(--t2);font-size:.85rem;line-height:1.7;margin-bottom:1.1rem"></div>
+    <div style="display:flex;gap:.7rem;justify-content:flex-end">
+      <button onclick="endTour()" style="background:transparent;border:1px solid var(--b2);border-radius:8px;padding:.4rem .9rem;color:var(--t3);font-size:.8rem;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s" onmouseenter="this.style.borderColor='var(--b3)';this.style.color='var(--t2)'" onmouseleave="this.style.borderColor='var(--b2)';this.style.color='var(--t3)'">Skip Tour</button>
+      <button id="tour-next-btn" onclick="tourNext()" style="background:linear-gradient(135deg,var(--a),var(--a2));border:none;border-radius:8px;padding:.4rem 1.1rem;color:#020810;font-size:.82rem;font-weight:700;font-family:'Exo 2',sans-serif;cursor:pointer;transition:all .2s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<button id="chatbot-fab" onclick="toggleChat()" style="position:fixed;bottom:56px;right:24px;z-index:9980;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));border:none;cursor:pointer;box-shadow:0 0 28px rgba(var(--ar),.5);font-size:1.4rem;display:flex;align-items:center;justify-content:center;transition:transform .25s,box-shadow .25s" onmouseenter="this.style.transform='scale(1.12)';this.style.boxShadow='0 0 44px rgba(var(--ar),.75)'" onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 0 28px rgba(var(--ar),.5)'">🤖</button>
+<div id="chatbot-win" style="position:fixed;bottom:122px;right:24px;z-index:9981;width:370px;max-height:520px;background:var(--surf2);border:1px solid var(--b3);border-radius:20px;box-shadow:0 0 60px rgba(var(--ar),.25),0 24px 60px rgba(0,0,0,.5);overflow:hidden;display:none;flex-direction:column">
+  <div style="padding:1rem 1.3rem;background:linear-gradient(135deg,rgba(var(--ar),.1),rgba(var(--a2r),.08));border-bottom:1px solid var(--b2);display:flex;align-items:center;gap:.7rem">
+    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🤖</div>
+    <div><div style="font-family:'Exo 2',sans-serif;font-weight:800;font-size:.95rem">PlaceIQ Assistant</div><div style="font-size:.7rem;color:var(--a);font-family:'DM Mono',monospace">● online · powered by Claude AI</div></div>
+    <button onclick="toggleChat()" style="margin-left:auto;background:transparent;border:none;color:var(--t3);font-size:1.2rem;cursor:pointer;padding:.2rem;line-height:1;transition:color .2s" onmouseenter="this.style.color='var(--t1)'" onmouseleave="this.style.color='var(--t3)'">✕</button>
+  </div>
+  <div id="chat-msgs" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.8rem;max-height:340px;scrollbar-width:thin">
+    <div class="chat-bubble bot" style="background:rgba(var(--ar),.07);border:1px solid var(--b2);border-radius:14px 14px 14px 4px;padding:.75rem 1rem;font-size:.85rem;color:var(--t1);line-height:1.65;max-width:90%">Hey! 👋 I'm your PlaceIQ AI assistant. Ask me anything — about colleges, placement strategies, GATE/CAT prep, or any general question. I'm here to help!</div>
+  </div>
+  <div style="padding:.8rem;border-top:1px solid var(--b2);display:flex;gap:.6rem;align-items:flex-end">
+    <textarea id="chat-input" placeholder="Ask anything…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" style="flex:1;background:var(--inp);border:1px solid var(--b2);border-radius:10px;padding:.6rem .9rem;color:var(--t1);font-size:.85rem;font-family:'Outfit',sans-serif;outline:none;resize:none;line-height:1.5;transition:border-color .2s;max-height:100px" onfocus="this.style.borderColor='var(--a)'" onblur="this.style.borderColor='var(--b2)'"></textarea>
+    <button onclick="sendChat()" style="background:linear-gradient(135deg,var(--a),var(--a2));border:none;border-radius:10px;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;transition:opacity .2s" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">➤</button>
+  </div>
+</div>
+      </div>
+      <!-- RESUME ANALYZER -->
+      <div class="tab" id="tc-resume">
+        <div class="hero">
+          <div class="eyebrow">AI Resume Intelligence</div>
+          <h1>Resume <span class="gw">Analyzer</span></h1>
+          <p>Upload your resume (PDF) and get instant AI-powered analysis, skill suggestions, and improvement tips.</p>
+        </div>
+        
+        <div class="pgrid">
+          <div class="pform scan">
+            <div class="ff">
+              <label>Upload Resume (PDF)</label>
+              <input type="file" id="resumeFile" accept=".pdf" style="background:var(--inp); border:1px solid var(--b2); border-radius:9px; padding:.7rem; color:var(--t1); width:100%">
+            </div>
+            <button class="btn btn-b" style="width:100%; margin-top:1rem" onclick="analyzeResume()">
+              🔍 Analyze Resume
+            </button>
+            <div class="ff" style="margin-top:1rem">
+              <label>Or paste your resume text</label>
+              <textarea id="resumeText" rows="6" placeholder="Paste your resume content here...&#10;&#10;Example:&#10;Education: B.Tech Computer Science, CGPA: 8.5&#10;Skills: Python, Machine Learning, SQL&#10;Internship: Software Developer at XYZ Corp" style="background:var(--inp); border:1px solid var(--b2); border-radius:9px; padding:.7rem; color:var(--t1); width:100%; font-family:'Outfit',sans-serif"></textarea>
+            </div>
+          </div>
+          
+          <div class="pres" id="resumeResult">
+            <div class="empti">📄</div>
+            <div class="empts">Upload your resume or paste text<br/>to get AI-powered analysis</div>
+          </div>
+        </div>
+      </div>
+
+<script>
+  /* ── RESUME ANALYZER ── */
+async function analyzeResume() {
+    const fileInput = document.getElementById('resumeFile');
+    const textInput = document.getElementById('resumeText');
+    const resultDiv = document.getElementById('resumeResult');
+    
+    if (!fileInput || !resultDiv) {
+        console.error('Resume elements not found');
+        return;
+    }
+    
+    resultDiv.innerHTML = '<div class="orb">⏳</div><div class="empts">Analyzing your resume...</div>';
+    
+    try {
+        let formData = new FormData();
+        
+        if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        } else if (textInput && textInput.value.trim()) {
+            formData.append('text', textInput.value);
+        } else {
+            resultDiv.innerHTML = '<div class="empti">⚠️</div><div class="empts">Please upload a PDF or paste resume text</div>';
+            return;
+        }
+        
+        const response = await fetch('http://127.0.0.1:5000/api/ml/resume', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Analysis failed');
+        }
+        
+        resultDiv.innerHTML = `
+            <div class="orb" style="border-color:rgba(var(--a),0.4)">📊</div>
+            <div class="reb">Resume Score</div>
+            <div class="sbig" style="color:var(--a)">${data.resume_score}/100</div>
+            
+            <div class="sbadge" style="background:rgba(var(--ar),0.1); border-color:var(--a)">
+                ${data.education} • ${data.experience_years} years experience
+            </div>
+            
+            <div class="pbw">
+                <div class="pbh"><span class="pbl">Skills Found</span><span class="pbp">${data.total_skills}</span></div>
+                <div class="ptrack"><div class="pfill" style="width:${Math.min(100, data.total_skills * 10)}%"></div></div>
+            </div>
+            
+            <div class="ri" style="margin-top:1rem">
+                <strong style="color:var(--a)">🎯 Skills Detected:</strong><br/>
+                <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem">
+                    ${data.skills_found.map(s => `<span class="chip" style="background:rgba(var(--ar),0.1); border-color:var(--a)">${s}</span>`).join('')}
+                </div>
+            </div>
+            
+            ${data.cgpa ? `<div class="ri"><strong style="color:var(--a)">📚 CGPA:</strong> ${data.cgpa}</div>` : ''}
+            
+            <div class="ri">
+                <strong style="color:var(--a2)">💡 Suggestions to Improve:</strong><br/>
+                <ul style="margin-top:0.5rem; margin-left:1rem; color:var(--t2)">
+                    ${data.suggestions.map(s => `<li style="margin-bottom:0.3rem">${s}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Resume analysis error:', error);
+        resultDiv.innerHTML = `
+            <div class="empti">⚠️</div>
+            <div class="empts">Error: ${error.message}<br/>Please try again</div>
+        `;
+    }
+}
+
+
+/* ── QUICK TOUR ── */
+const TOUR_STEPS=[
+  {sel:'nav .nbrand',title:'Welcome to PlaceIQ',body:'Your all-in-one placement intelligence platform — built by Ritesh Kumar Singh to help students make smarter career decisions.'},
+  {sel:'#nl-home',title:'College Discovery',body:'Browse 500+ colleges with real placement data. Filter by stream, state, fees, and search by name or city.'},
+  {sel:'#nl-pred',title:'Placement AI Predictor',body:'Enter your CGPA, tier, skills & internships — get an instant CTC range and placement probability tailored to you.'},
+  {sel:'#nl-score',title:'Score Oracle',body:'Predict your GATE or CAT score based on your mock averages, prep duration, and subject mastery.'},
+  {sel:'#nl-compare',title:'Head-to-Head Compare',body:'Pick up to 4 colleges and compare them on every placement metric. Best values auto-highlight in neon green.'},
+  {sel:'#nl-help',title:'Help & Contact',body:'Find FAQs and contact Ritesh directly via phone or email. You can also chat with the AI Assistant anytime via the 🤖 button.'},
+];
+let tourIdx=0;
+function startTour(){
+  tourIdx=0;document.getElementById('tour-overlay').style.display='block';
+  showTourStep();
+}
+function showTourStep(){
+  const step=TOUR_STEPS[tourIdx];
+  const el=document.querySelector(step.sel);
+  const tip=document.getElementById('tour-tip');
+  const hl=document.getElementById('tour-highlight');
+  document.getElementById('tour-step-lbl').textContent=`STEP ${tourIdx+1} / ${TOUR_STEPS.length}`;
+  document.getElementById('tour-title').textContent=step.title;
+  document.getElementById('tour-body').textContent=step.body;
+  document.getElementById('tour-next-btn').textContent=tourIdx===TOUR_STEPS.length-1?'Finish ✓':'Next →';
+  if(el){
+    const r=el.getBoundingClientRect();
+    hl.style.left=(r.left-8)+'px';hl.style.top=(r.top-8)+'px';hl.style.width=(r.width+16)+'px';hl.style.height=(r.height+16)+'px';
+    let tx=r.left,ty=r.bottom+20;
+    if(ty+220>window.innerHeight)ty=r.top-240;
+    if(tx+330>window.innerWidth)tx=window.innerWidth-345;
+    tip.style.left=Math.max(12,tx)+'px';tip.style.top=Math.max(12,ty)+'px';
+  }
+}
+function tourNext(){
+  if(tourIdx<TOUR_STEPS.length-1){tourIdx++;showTourStep()}else endTour();
+}
+function endTour(){document.getElementById('tour-overlay').style.display='none'}
+
+/* ── CHATBOT ── */
+let chatOpen=false;
+function toggleChat(){
+  chatOpen=!chatOpen;
+  const w=document.getElementById('chatbot-win');
+  w.style.display=chatOpen?'flex':'none';
+  if(chatOpen){w.style.flexDirection='column';document.getElementById('chat-input').focus()}
+}
+function addMsg(text,role){
+  const d=document.getElementById('chat-msgs');
+  const div=document.createElement('div');
+  div.style.cssText=role==='user'
+    ?'background:rgba(var(--a2r),.12);border:1px solid rgba(var(--a2r),.2);border-radius:14px 14px 4px 14px;padding:.75rem 1rem;font-size:.85rem;color:var(--t1);line-height:1.65;max-width:90%;align-self:flex-end;word-break:break-word'
+    :'background:rgba(var(--ar),.07);border:1px solid var(--b2);border-radius:14px 14px 14px 4px;padding:.75rem 1rem;font-size:.85rem;color:var(--t1);line-height:1.65;max-width:90%;word-break:break-word';
+  div.textContent=text;
+  d.appendChild(div);
+  d.scrollTop=d.scrollHeight;
+  return div;
+}
+const chatHistory=[];
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const msg=inp.value.trim();
+  if(!msg)return;
+  inp.value='';inp.style.height='auto';
+  addMsg(msg,'user');
+  chatHistory.push({role:'user',content:msg});
+  const typing=addMsg('…','bot');
+  typing.style.color='var(--t3)';
+  
+  console.log('Sending message:', msg); // Debug log
+  console.log('Chat history:', chatHistory); // Debug log
+  
+  try{
+    console.log('Calling API...'); // Debug log
+    const res = await fetch('http://127.0.0.1:5000/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory })
+    });
+    
+    console.log('Response status:', res.status); // Debug log
+    
+    const data=await res.json();
+    console.log('Response data:', data); // Debug log
+    
+    const reply=data.reply ||'Sorry, I could not get a response. Please try again.';
+    typing.textContent=reply;
+    typing.style.color='var(--t1)';
+    chatHistory.push({role:'assistant',content:reply});
+  }catch(err){
+    console.error('Error details:', err); // Debug log
+    typing.textContent='⚠ Connection error. Please try again.';
+    typing.style.color='var(--a3)';
+    chatHistory.pop();
+  }
+}
+function generatePersonalizedSuggestions(cgpa, tier, skillsCount, stream, prob, selectedSkillsArray) {
+    // Prepare data for suggestions
+    const skillGap = [];
+    const certs = [];
+    const roadmapSteps = [];
+    const projectIdeas = [];
+
+    // 1. Skill Gap Analysis (based on stream and current skills)
+    const inDemand = {
+        "Computer Science": ["System Design", "DSA", "Cloud (AWS/GCP)", "Kubernetes", "Python"],
+        "Data Science / AI": ["MLOps", "LLM Fine-tuning", "PyTorch", "LangChain", "SQL"],
+        "Electronics": ["VLSI", "Embedded C", "PCB Design", "MATLAB"],
+        "Mechanical": ["CAD", "CFD", "ANSYS", "Six Sigma"],
+        "Civil": ["AutoCAD", "Project Management", "STAAD Pro"],
+        "MBA": ["Financial Modelling", "Data Analytics", "Strategic Management", "Excel"],
+        "default": ["Communication", "Problem Solving", "Teamwork", "Time Management"]
+    };
+    const streamKey = stream.includes("Data") ? "Data Science / AI" : (stream.includes("CSE") ? "Computer Science" : stream);
+    const recommended = inDemand[streamKey] || inDemand.default;
+    const missing = recommended.filter(skill => !selectedSkillsArray.some(s => s.toLowerCase().includes(skill.toLowerCase())));
+    if (missing.length) {
+        skillGap.push(`• ${missing.slice(0, 3).join(", ")} – these skills are highly sought after in ${stream}.`);
+    }
+
+    // 2. Certifications based on stream and skills
+    if (stream.includes("CSE") || stream.includes("Data")) {
+        certs.push("• AWS Certified Solutions Architect – cloud skills boost CTC by 20%");
+        certs.push("• Google Professional Machine Learning Engineer – for AI roles");
+    } else if (stream.includes("MBA")) {
+        certs.push("• CFA Level 1 – adds weight for finance roles");
+        certs.push("• PMP – project management certification");
+    } else if (stream.includes("Electronics")) {
+        certs.push("• VLSI Design Certification (IITs/IIITs)");
+    } else {
+        certs.push("• Microsoft Certified: Azure Fundamentals");
+        certs.push("• Google Project Management Certificate");
+    }
+
+    // 3. Personalized Roadmap based on CGPA, tier, prob
+    if (cgpa < 7.0) {
+        roadmapSteps.push("• Focus on improving CGPA to 7.0+ – it increases shortlisting chances by 40%.");
+    }
+    if (tier === 3) {
+        roadmapSteps.push("• Build strong projects and GitHub profile to stand out among Tier-1 competition.");
+    }
+    if (skillsCount < 5) {
+        roadmapSteps.push("• Learn at least 5 in-demand skills (use the search above).");
+    }
+    if (prob < 50) {
+        roadmapSteps.push("• Start preparing for competitive exams (GATE/CAT) to open more opportunities.");
+    } else if (prob > 80) {
+        roadmapSteps.push("• You're in the top tier – aim for high-target companies and consider applying early.");
+    }
+    if (roadmapSteps.length === 0) roadmapSteps.push("• Maintain your momentum; start networking on LinkedIn.");
+
+    // 4. Project ideas
+    if (stream.includes("CSE")) {
+        projectIdeas.push("• Build a full-stack app with React + Node + MongoDB");
+        projectIdeas.push("• Create a machine learning model (e.g., salary predictor) and deploy it");
+    } else if (stream.includes("MBA")) {
+        projectIdeas.push("• Develop a business plan for a startup in your interest area");
+        projectIdeas.push("• Analyze a company's financial statements and present insights");
+    } else {
+        projectIdeas.push("• Collaborate on an open-source project related to your domain");
+        projectIdeas.push("• Build a portfolio website showcasing your skills and projects");
+    }
+
+    // Update DOM
+    const skillGapDiv = document.getElementById('skill-gap');
+    const skillGapContent = document.getElementById('skill-gap-content');
+    if (skillGap.length) {
+        skillGapDiv.style.display = 'block';
+        skillGapContent.innerHTML = skillGap.map(s => `<div>${s}</div>`).join('');
+    } else {
+        skillGapDiv.style.display = 'none';
+    }
+
+    const certDiv = document.getElementById('certifications');
+    const certContent = document.getElementById('cert-content');
+    if (certs.length) {
+        certDiv.style.display = 'block';
+        certContent.innerHTML = certs.map(c => `<div>${c}</div>`).join('');
+    } else {
+        certDiv.style.display = 'none';
+    }
+
+    const roadmapDiv = document.getElementById('roadmap');
+    const roadmapContent = document.getElementById('roadmap-content');
+    if (roadmapSteps.length) {
+        roadmapDiv.style.display = 'block';
+        roadmapContent.innerHTML = roadmapSteps.map(r => `<div>${r}</div>`).join('');
+    } else {
+        roadmapDiv.style.display = 'none';
+    }
+
+    const projectsDiv = document.getElementById('projects');
+    const projectsContent = document.getElementById('projects-content');
+    if (projectIdeas.length) {
+        projectsDiv.style.display = 'block';
+        projectsContent.innerHTML = projectIdeas.map(p => `<div>${p}</div>`).join('');
+    } else {
+        projectsDiv.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Penetration Test Report - VulnerableBank</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        h1 { color: #d9534f; }
+        h2 { color: #5bc0de; border-bottom: 1px solid #ccc; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .risk-critical { color: red; font-weight: bold; }
+        .risk-high { color: orange; font-weight: bold; }
+        .risk-medium { color: #f0ad4e; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .footer { margin-top: 50px; font-size: 12px; text-align: center; color: gray; }
+    </style>
+</head>
+<body>
+
+<h1>🔒 Penetration Test Report – VulnerableBank</h1>
+<p><strong>Engagement Date:</strong> 11-06-2026<br>
+<strong>Prepared by:</strong> Ritesh Kumar Singh<br>
+<strong>Application:</strong> VulnerableBank – Banking Web Application<br>
+<strong>Environment:</strong> Isolated Docker Lab (Kali Linux + Docker Desktop)</p>
+
+<h2>📋 Executive Summary</h2>
+<p>A comprehensive penetration test was conducted against VulnerableBank, a purposely vulnerable banking web application. The engagement successfully identified <strong>12+ high/critical severity vulnerabilities</strong>, including SQL Injection, IDOR, XSS, business logic flaws, unrestricted file upload, weak session management, and information disclosure. All attacks were performed in a contained lab environment.</p>
+<p><strong>Overall Risk Rating:</strong> 🔴 <span class="risk-critical">Critical (CVSS 9.8 average)</span></p>
+<p><strong>Key Findings:</strong></p>
+<ul>
+    <li>SQL Injection in login form (no prepared statements)</li>
+    <li>IDOR allowing unauthorized account access</li>
+    <li>Negative amount transfer (business logic bypass)</li>
+    <li>Reflected XSS via error parameter</li>
+    <li>Unrestricted file upload (reverse‑shell possible)</li>
+</ul>
+
+<h2>🎯 Scope & Methodology</h2>
+<p><strong>In-Scope Assets:</strong> Web Application (http://localhost:5001), PostgreSQL 15, APIs: /login, /transfer, /account/&lt;id&gt;, /profile, /admin</p>
+<p><strong>Testing Methodology (PTES & OWASP):</strong> Reconnaissance → Vulnerability Analysis → Exploitation → Post-Exploitation → Reporting</p>
+<p><strong>Tools Used:</strong> Kali Linux, Nmap, Burp Suite, Hydra, Nessus, OpenVAS, Veil, Wireshark</p>
+
+<h2>🔍 Detailed Findings</h2>
+
+<h3>F‑01: SQL Injection in Login Form (Critical)</h3>
+<p><strong>Location:</strong> /login – username field<br>
+<strong>Reproduction:</strong> Username: <code>' OR '1'='1' --</code>, Password: anything. → Logged in as admin without password.</p>
+<p><strong>Remediation:</strong> Use parameterized queries / prepared statements.</p>
+
+<h3>F‑02: Insecure Direct Object Reference (IDOR) – High</h3>
+<p><strong>Location:</strong> /account/&lt;id&gt;<br>
+<strong>Reproduction:</strong> Login as alice (password: hello), then access /account/3 → see Bob's account details.</p>
+<p><strong>Remediation:</strong> Implement server‑side access control; verify user_id matches session.</p>
+
+<h3>F‑03: Negative Amount Transfer (Business Logic Bypass) – Critical</h3>
+<p><strong>Location:</strong> /transfer endpoint<br>
+<strong>Reproduction:</strong> Transfer amount -500 to same account → balance increases.</p>
+<p><strong>Remediation:</strong> Validate amount > 0 server‑side.</p>
+
+<h3>F‑04: Reflected XSS via error Parameter – Medium</h3>
+<p><strong>Location:</strong> /error?message=...<br>
+<strong>Reproduction:</strong> http://localhost:5001/error?message=&lt;script&gt;alert('XSS')&lt;/script&gt;</p>
+<p><strong>Remediation:</strong> Output encoding (escape user input).</p>
+
+<h3>F‑05: Unrestricted File Upload – High</h3>
+<p><strong>Location:</strong> /profile (profile picture upload)<br>
+<strong>Reproduction:</strong> Upload shell.php → file stored in /static/uploads/</p>
+<p><strong>Remediation:</strong> Validate file type (MIME, magic bytes); store outside webroot; rename files.</p>
+
+<h3>F‑06: Weak Session Management – Medium</h3>
+<p><strong>Location:</strong> Entire app<br>
+<strong>Issues:</strong> auth_token missing HttpOnly flag; JWT weak secret; no session regeneration.</p>
+<p><strong>Remediation:</strong> Set HttpOnly, Secure, SameSite flags; use strong secrets; regenerate session on login.</p>
+
+<h3>F‑07: Information Disclosure – Low</h3>
+<p><strong>Location:</strong> Debug mode enabled (debug=True)<br>
+<strong>Reproduction:</strong> Trigger any unhandled exception – full traceback appears.</p>
+<p><strong>Remediation:</strong> Disable debug mode in production; implement custom error pages.</p>
+
+<h2>📊 Risk Matrix</h2>
+<table>
+    <tr><th>Finding</th><th>CVSS v3.1</th><th>Severity</th><th>Remediation Priority</th></tr>
+    <tr><td>SQL Injection</td><td>9.8</td><td class="risk-critical">Critical</td><td>1 (Immediate)</td></tr>
+    <tr><td>Negative Amount Transfer</td><td>8.6</td><td class="risk-high">High</td><td>1</td></tr>
+    <tr><td>IDOR</td><td>6.5</td><td class="risk-medium">Medium</td><td>2</td></tr>
+    <tr><td>Unrestricted File Upload</td><td>7.2</td><td class="risk-high">High</td><td>1</td></tr>
+    <tr><td>Reflected XSS</td><td>6.1</td><td class="risk-medium">Medium</td><td>2</td></tr>
+    <tr><td>Weak Session Mgmt</td><td>5.3</td><td class="risk-medium">Medium</td><td>2</td></tr>
+    <tr><td>Information Disclosure</td><td>3.7</td><td>Low</td><td>3</td></tr>
+</table>
+
+<h2>🔧 Remediation Roadmap</h2>
+<ul>
+    <li><strong>Short‑term (0‑2 days):</strong> Fix SQL injection, validate transfer amount, restrict file uploads.</li>
+    <li><strong>Mid‑term (1 week):</strong> Implement access control, set HttpOnly/Secure flags, disable debug mode.</li>
+    <li><strong>Long‑term (2‑4 weeks):</strong> CSRF tokens, rate limiting, CSP, regular security testing.</li>
+</ul>
+
+<h2>📎 Appendix</h2>
+<p><strong>Exploit Proof‑of‑Concept Snippets</strong></p>
+<pre>SQLi (curl): curl -X POST http://localhost:5001/login -d "username=' OR '1'='1' --&password=x"
+Negative Transfer: POST /transfer with amount=-500</pre>
+<p><strong>Screenshots Checklist:</strong> SQL injection login, IDOR access, negative balance before/after, XSS popup, uploaded shell.php, cookie flags, debug stack trace.</p>
+
+<div class="footer">
+    Report Prepared By: Ritesh Kumar Singh<br>
+    🔗 <a href="https://github.com/Riteshkumarsingh1">GitHub Profile</a><br>
+    <strong>Disclaimer:</strong> This test was performed in an isolated lab environment. Do not use against real systems without permission.
+</div>
+
+</body>
+</html>
