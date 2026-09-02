@@ -14,3 +14,4 @@ scipy==1.17.1
 gunicorn==22.0.0
 apscheduler==3.10.4
 bcrypt==4.1.2
+requests==2.31.0
