@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV PORT=10000
 EXPOSE 10000
 
-CMD ["python", "-c", "import os; from app import app; port = int(os.environ.get('PORT', 10000)); app.run(host='0.0.0.0', port=port, debug=False)"]
+CMD ["python", "app.py"]
