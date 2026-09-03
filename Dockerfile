@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=10000
 EXPOSE 10000
 
-CMD ["python", "app.py"]
+CMD ["sh", "-c", "python app.py 2>&1 | tee /tmp/app.log; tail -f /tmp/app.log"]
