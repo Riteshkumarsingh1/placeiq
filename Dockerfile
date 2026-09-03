@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt-dev \
     gcc \
-    postgresql-client \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,4 +16,4 @@ COPY . .
 
 ENV PORT=10000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:create_app()"]
