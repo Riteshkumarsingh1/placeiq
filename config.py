@@ -6,12 +6,8 @@ load_dotenv()
 
 class Config:
     # ── Database ──────────────────────────────────────────────
-    # Render 'postgres://' format deta hai, SQLAlchemy ko 'postgresql://' chahiye
-    raw_url = os.environ.get('DATABASE_URL')
-    if raw_url and raw_url.startswith('postgres://'):
-        raw_url = raw_url.replace('postgres://', 'postgresql://', 1)
-    
-    SQLALCHEMY_DATABASE_URI = raw_url or "sqlite:///placeiq.db"
+    # 🔥 TEMPORARY HARDCODE – Render ke Internal Connection String se replace karo
+    SQLALCHEMY_DATABASE_URI = "postgresql://placeiq_user:QK7tvXOVqmP3XwT3r9RMPBkTKjl3wsAM@dpg-dac9gv15efls73dj8240-a/placeiq_lbbl"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # ── JWT ───────────────────────────────────────────────────
