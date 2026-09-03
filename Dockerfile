@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt-dev \
     gcc \
+    postgresql-client \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
