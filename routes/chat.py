@@ -34,7 +34,7 @@
 #         }
         
 #         payload = {
-#             "model": "llama-3.3-70b-versatile",
+#             "model": "mixtral-8x7b-32768",
 #             "messages": full_messages,
 #             "max_tokens": 500,
 #             "temperature": 0.7
@@ -95,7 +95,7 @@ def chat():
         }
         
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "mixtral-8x7b-32768",
             "messages": full_messages,
             "max_tokens": 500,
             "temperature": 0.7
